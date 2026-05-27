@@ -1,0 +1,28 @@
+package com.munecat.pokemon.domain.usecase
+
+import com.munecat.pokemon.domain.entity.Pokemon
+import com.munecat.pokemon.domain.repository.PokemonRepository
+import kotlinx.coroutines.flow.first
+
+class ManageTeamUseCase(
+    private val repository: PokemonRepository
+) {
+    suspend fun addToTeam(pokemon: Pokemon) {
+        val currentTeam = repository.getTeam().first()
+
+        if (currentTeam.size >= 3) {
+            throw TeamFullException()
+        }
+        if (currentTeam.any { it.id == pokemon.id }) {
+            throw PokemonAlreadyInTeamException()
+        }
+        repository.updateTeamStatus(pokemon.id, isInTeam = true)
+    }
+
+    suspend fun removeFromTeam(pokemonId: Int) {
+        repository.updateTeamStatus(pokemonId, isInTeam = false)
+    }
+}
+
+class TeamFullException : Exception("There are already 3 pokemon in team!")
+class PokemonAlreadyInTeamException : Exception("This pokemon is already in team!")
