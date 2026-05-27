@@ -1,6 +1,5 @@
-package com.munecat.pokemon.ui.theme
+package com.munecat.pokemon.presentation.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

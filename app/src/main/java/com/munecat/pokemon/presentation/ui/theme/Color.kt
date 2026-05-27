@@ -1,4 +1,4 @@
-package com.munecat.pokemon.ui.theme
+package com.munecat.pokemon.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
