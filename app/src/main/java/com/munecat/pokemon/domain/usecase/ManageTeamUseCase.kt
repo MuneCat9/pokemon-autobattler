@@ -1,6 +1,6 @@
 package com.munecat.pokemon.domain.usecase
 
-import com.munecat.pokemon.domain.entity.Pokemon
+import com.munecat.pokemon.domain.model.Pokemon
 import com.munecat.pokemon.domain.repository.PokemonRepository
 import kotlinx.coroutines.flow.first
 

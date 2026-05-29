@@ -1,7 +1,7 @@
 [versions]
 agp = "9.2.1"
 coilCompose = "3.4.0"
-coilSvg = "3.4.0"
+coilSvg = "2.7.0"
 converterKotlinxSerialization = "3.0.0"
 coreKtx = "1.18.0"
 coreSplashscreen = "1.2.0"

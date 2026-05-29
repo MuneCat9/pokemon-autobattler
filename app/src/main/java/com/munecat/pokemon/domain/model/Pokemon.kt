@@ -1,4 +1,4 @@
-package com.munecat.pokemon.domain.entity
+package com.munecat.pokemon.domain.model
 
 data class Pokemon(
     val id: Int,

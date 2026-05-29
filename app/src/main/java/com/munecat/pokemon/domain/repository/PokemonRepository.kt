@@ -1,6 +1,6 @@
 package com.munecat.pokemon.domain.repository
 
-import com.munecat.pokemon.domain.entity.Pokemon
+import com.munecat.pokemon.domain.model.Pokemon
 import kotlinx.coroutines.flow.Flow
 
 interface PokemonRepository {
