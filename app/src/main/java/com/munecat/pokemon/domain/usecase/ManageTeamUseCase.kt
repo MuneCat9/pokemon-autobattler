@@ -3,8 +3,9 @@ package com.munecat.pokemon.domain.usecase
 import com.munecat.pokemon.domain.model.Pokemon
 import com.munecat.pokemon.domain.repository.PokemonRepository
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
 
-class ManageTeamUseCase(
+class ManageTeamUseCase @Inject constructor(
     private val repository: PokemonRepository
 ) {
     suspend fun addToTeam(pokemon: Pokemon) {

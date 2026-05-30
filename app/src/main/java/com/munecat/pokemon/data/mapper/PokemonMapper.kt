@@ -32,6 +32,7 @@ fun PokemonDbModel.toModel(): Pokemon {
     } catch (e: Exception) {
         emptyList()
     }
+
     return Pokemon(
         id = id,
         name = name,
