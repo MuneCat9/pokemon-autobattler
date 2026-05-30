@@ -2,6 +2,7 @@ package com.munecat.pokemon.domain.usecase
 
 import com.munecat.pokemon.domain.model.Pokemon
 import com.munecat.pokemon.domain.repository.PokemonRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -22,6 +23,10 @@ class ManageTeamUseCase @Inject constructor(
 
     suspend fun removeFromTeam(pokemonId: Int) {
         repository.updateTeamStatus(pokemonId, isInTeam = false)
+    }
+
+    fun getTeam(): Flow<List<Pokemon>> {
+        return repository.getTeam()
     }
 }
 
