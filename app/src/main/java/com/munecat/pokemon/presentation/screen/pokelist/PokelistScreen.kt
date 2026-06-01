@@ -1,5 +1,9 @@
 package com.munecat.pokemon.presentation.screen.pokelist
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,8 +33,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -42,6 +50,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.munecat.pokemon.R
 import com.munecat.pokemon.domain.model.Pokemon
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,88 +60,111 @@ fun PokeListScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        modifier = Modifier.padding(start = 68.dp),
-                        text = "Pokédex"
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                                                         // TO DO !!!!!!!!!!!!!!
-                    IconButton(
-                        modifier = Modifier.padding(end = 8.dp),
-                        onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Default.FilterList,
-                            contentDescription = "Filter"
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            modifier = Modifier.padding(start = 78.dp),
+                            text = "Pokédex"
                         )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    actions = {
+                        // TO DO !!!!!!!!!!!!!!
+                        IconButton(
+                            onClick = { }) {
+                            Icon(
+                                imageVector = Icons.Default.FilterList,
+                                contentDescription = "Filter"
+                            )
+                        }
+                    }
+                )
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                if (state.isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        items(
+                            items = state.allPokemon,
+                            key = { it.id }
+                        ) { pokemon ->
+                            PokemonListItem(
+                                pokemon = pokemon,
+                                isInTeam = state.team.any { it.id == pokemon.id },
+                                onAddClick = {
+                                    viewModel.processCommand(
+                                        PokelistCommand.AddToTeam(
+                                            pokemon
+                                        )
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
 
-            if (state.isLoading) {
+                TeamSlots(
+                    team = state.team,
+                    onRemoveClick = { pokemonId ->
+                        viewModel.processCommand(PokelistCommand.RemoveFromTeam(pokemonId = pokemonId))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+            }
+        }
+
+        state.error?.let { error ->
+            var isVisible by remember { mutableStateOf(true) }
+
+            LaunchedEffect(state.errorTimestamp) {
+                isVisible = true
+                delay(500L)
+                isVisible = false
+                delay(1200L)
+                viewModel.clearError()
+            }
+            AnimatedVisibility(
+                visible = isVisible,
+                enter = fadeIn(animationSpec = tween(300)),
+                exit = fadeOut(animationSpec = tween(1200))
+            ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
+                        fontSize = 48.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .padding(32.dp)
+                    )
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    items(
-                        items = state.allPokemon,
-                        key = { it.id }
-                    ) { pokemon ->
-                        PokemonListItem(
-                            pokemon = pokemon,
-                            isInTeam = state.team.any { it.id == pokemon.id },
-                            onAddClick = {
-                                viewModel.processCommand(
-                                    PokelistCommand.AddToTeam(
-                                        pokemon
-                                    )
-                                )
-                            }
-                        )
-                    }
-                }
-            }
-
-            // Команда снизу
-            TeamSlots(
-                team = state.team,
-                onRemoveClick = { pokemonId ->
-                    viewModel.processCommand(PokelistCommand.RemoveFromTeam(pokemonId = pokemonId))
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            )
-
-            // Ошибка
-            state.error?.let { error ->
-                Text(
-                    text = error,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
             }
         }
     }

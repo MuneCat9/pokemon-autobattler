@@ -85,15 +85,23 @@ class PokelistViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 manageTeamUseCase.addToTeam(pokemon)
+                _state.update { it.copy(error = null) }
                 if (pokemon.id !in teamOrder) {
                     teamOrder.add(pokemon.id)
                 }
             } catch (e: TeamFullException) {
-                _state.update { it.copy(error = "Team is full! (max 3)") }
-            } catch (e: PokemonAlreadyInTeamException) {
-                _state.update { it.copy(error = "Already in team!") }
-            }
+                _state.update {
+                    it.copy(
+                        error = "Team is full!",
+                        errorTimestamp = System.currentTimeMillis()
+                    )
+                }
+            } catch (e: PokemonAlreadyInTeamException) { }
         }
+    }
+
+    fun clearError() {
+        _state.update { it.copy(error = null) }
     }
 
     private fun removeFromTeam(pokemonId: Int) {
@@ -113,5 +121,6 @@ data class PokelistState(
     val allPokemon: List<Pokemon> = emptyList(),
     val team: List<Pokemon> = emptyList(),
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
+    val errorTimestamp: Long = 0L
 )
