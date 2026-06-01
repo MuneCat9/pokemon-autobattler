@@ -7,10 +7,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.create
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -46,6 +48,17 @@ object ApiServiceModule {
         return Retrofit.Builder()
             .baseUrl("https://pokeapi.co/api/v2/")
             .addConverterFactory(converterFactory)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
             .build()
     }
 }

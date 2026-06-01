@@ -22,9 +22,12 @@ class PokelistViewModel @Inject constructor(
     private val _state = MutableStateFlow(PokelistState())
     val state = _state.asStateFlow()
 
+    private val teamOrder = mutableListOf<Int>()
+
     init {
         loadPokemonList()
         observeTeam()
+        refreshDataIfNeeded()
     }
 
     private fun loadPokemonList() {
@@ -44,9 +47,21 @@ class PokelistViewModel @Inject constructor(
         viewModelScope.launch {
             manageTeamUseCase.getTeam().collect { team ->
                 _state.update { currentState ->
-                    currentState.copy(team = team)
+                    if (teamOrder.isEmpty() && team.isNotEmpty()) {
+                        teamOrder.addAll(team.map { it.id })
+                    }
+                    val sortedTeam = teamOrder.mapNotNull { orderId ->
+                        team.find { it.id == orderId }
+                    }
+                    currentState.copy(team = sortedTeam)
                 }
             }
+        }
+    }
+
+    private fun refreshDataIfNeeded() {
+        viewModelScope.launch {
+            manageTeamUseCase.refreshDataIfEmpty()
         }
     }
 
@@ -61,6 +76,9 @@ class PokelistViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 manageTeamUseCase.addToTeam(pokemon)
+                if (pokemon.id !in teamOrder) {
+                    teamOrder.add(pokemon.id)
+                }
             } catch (e: TeamFullException) {
                 _state.update { it.copy(error = "Team is full! (max 3)") }
             } catch (e: PokemonAlreadyInTeamException) {
@@ -72,6 +90,7 @@ class PokelistViewModel @Inject constructor(
     private fun removeFromTeam(pokemonId: Int) {
         viewModelScope.launch {
             manageTeamUseCase.removeFromTeam(pokemonId)
+            teamOrder.remove(pokemonId)
         }
     }
 }

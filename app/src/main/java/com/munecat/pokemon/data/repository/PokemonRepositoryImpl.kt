@@ -7,6 +7,7 @@ import com.munecat.pokemon.data.remote.PokeApiService
 import com.munecat.pokemon.domain.model.Pokemon
 import com.munecat.pokemon.domain.repository.PokemonRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -33,11 +34,20 @@ class PokemonRepositoryImpl @Inject constructor(
 
     override suspend fun refreshPokemonData() {
         val listResponse = apiService.getPokemonList(limit = 151)
+        val existingPokemon = pokemonDao.getAllPokemon().first().associateBy { it.id }
+
         listResponse.results.forEach { result ->
             val id = result.url.trimEnd('/').split('/').last().toInt()
             val detail = apiService.getPokemonDetail(id)
             val entityDto = detail.toDbModel()
-            pokemonDao.insertAll(listOf(entityDto))
+
+            val existing = existingPokemon[id]
+            val updatedEntity = if (existing != null) {
+                entityDto.copy(isInTeam = existing.isInTeam)
+            } else {
+                entityDto
+            }
+            pokemonDao.insertAll(listOf(updatedEntity))
         }
     }
 }
