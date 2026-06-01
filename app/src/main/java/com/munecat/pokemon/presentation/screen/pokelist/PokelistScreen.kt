@@ -68,7 +68,7 @@ fun PokeListScreen(
                 actions = {
                                                          // TO DO !!!!!!!!!!!!!!
                     IconButton(
-                        modifier = Modifier.padding(end = 16.dp),
+                        modifier = Modifier.padding(end = 8.dp),
                         onClick = { }) {
                         Icon(
                             imageVector = Icons.Default.FilterList,

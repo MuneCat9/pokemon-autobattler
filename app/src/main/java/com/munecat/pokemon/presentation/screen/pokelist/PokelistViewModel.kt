@@ -61,7 +61,16 @@ class PokelistViewModel @Inject constructor(
 
     private fun refreshDataIfNeeded() {
         viewModelScope.launch {
-            manageTeamUseCase.refreshDataIfEmpty()
+            _state.update {
+                it.copy(isLoading = true)
+            }
+            try {
+                manageTeamUseCase.refreshDataIfEmpty()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Network error. Pull to retry.") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 
