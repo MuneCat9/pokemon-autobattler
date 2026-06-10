@@ -28,6 +28,10 @@ class ManageTeamUseCase @Inject constructor(
     fun getTeam(): Flow<List<Pokemon>> {
         return repository.getTeam()
     }
+
+    suspend fun refreshDataIfEmpty() {
+        repository.refreshPokemonData()
+    }
 }
 
 class TeamFullException : Exception("There are already 3 pokemon in team!")

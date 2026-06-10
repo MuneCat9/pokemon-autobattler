@@ -1,5 +1,8 @@
 package com.munecat.pokemon.domain.model
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class Pokemon(
     val id: Int,
     val name: String,

@@ -2,6 +2,7 @@
 agp = "9.2.1"
 coilCompose = "3.4.0"
 coilSvg = "2.7.0"
+coilSvgVersion = "3.5.0-beta01"
 converterKotlinxSerialization = "3.0.0"
 coreKtx = "1.18.0"
 coreSplashscreen = "1.2.0"
@@ -24,6 +25,7 @@ roomRuntime = "2.8.4"
 ksp = "2.3.4"
 hilt = "2.59.2"
 workRuntimeKtx = "2.11.2"
+runtime = "1.11.2"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtendedVersion" }
@@ -42,6 +44,7 @@ androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
 coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coilSvg" }
+coil3-coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coilSvgVersion" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
@@ -61,6 +64,7 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit2-converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 
 
 [plugins]

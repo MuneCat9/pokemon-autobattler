@@ -2,6 +2,7 @@ package com.munecat.pokemon.presentation.screen.pokelist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.munecat.pokemon.data.local.TeamPreferences
 import com.munecat.pokemon.domain.model.Pokemon
 import com.munecat.pokemon.domain.usecase.GetAllPokemonUseCase
 import com.munecat.pokemon.domain.usecase.ManageTeamUseCase
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PokelistViewModel @Inject constructor(
     private val manageTeamUseCase: ManageTeamUseCase,
-    private val getAllPokemonUseCase: GetAllPokemonUseCase
+    private val getAllPokemonUseCase: GetAllPokemonUseCase,
+    private val teamPreferences: TeamPreferences
 ) : ViewModel() {
     private val _state = MutableStateFlow(PokelistState())
     val state = _state.asStateFlow()
@@ -25,6 +27,7 @@ class PokelistViewModel @Inject constructor(
     init {
         loadPokemonList()
         observeTeam()
+        refreshDataIfNeeded()
     }
 
     private fun loadPokemonList() {
@@ -44,8 +47,41 @@ class PokelistViewModel @Inject constructor(
         viewModelScope.launch {
             manageTeamUseCase.getTeam().collect { team ->
                 _state.update { currentState ->
-                    currentState.copy(team = team)
+                    // Строим команду по слотам из DataStore
+                    val slots = teamPreferences.getSlots()
+                    val sortedTeam = slots.mapNotNull { slotId ->
+                        if (slotId == TeamPreferences.EMPTY_SLOT) null
+                        else team.find { it.id == slotId }
+                    }
+                    // Добавляем покемонов из БД, которых нет в слотах (первая загрузка)
+                    val teamFromDb = team.filter { pokemon ->
+                        pokemon.id !in slots
+                    }
+                    // Если слоты пусты — заполняем их текущей командой
+                    if (slots.all { it == TeamPreferences.EMPTY_SLOT } && team.isNotEmpty()) {
+                        team.forEachIndexed { index, pokemon ->
+                            teamPreferences.saveSlot(index, pokemon.id)
+                        }
+                        currentState.copy(team = team)
+                    } else {
+                        currentState.copy(team = sortedTeam + teamFromDb)
+                    }
                 }
+            }
+        }
+    }
+
+    private fun refreshDataIfNeeded() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isLoading = true)
+            }
+            try {
+                manageTeamUseCase.refreshDataIfEmpty()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Network error. Pull to retry.") }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -61,17 +97,35 @@ class PokelistViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 manageTeamUseCase.addToTeam(pokemon)
+                _state.update { it.copy(error = null) }
+                val slots = teamPreferences.getSlots()
+                val emptyIndex = slots.indexOf(TeamPreferences.EMPTY_SLOT)
+                if (emptyIndex != -1) {
+                    teamPreferences.saveSlot(emptyIndex, pokemon.id)
+                }
             } catch (e: TeamFullException) {
-                _state.update { it.copy(error = "Team is full! (max 3)") }
-            } catch (e: PokemonAlreadyInTeamException) {
-                _state.update { it.copy(error = "Already in team!") }
-            }
+                _state.update {
+                    it.copy(
+                        error = "Team is full!",
+                        errorTimestamp = System.currentTimeMillis()
+                    )
+                }
+            } catch (e: PokemonAlreadyInTeamException) { }
         }
+    }
+
+    fun clearError() {
+        _state.update { it.copy(error = null) }
     }
 
     private fun removeFromTeam(pokemonId: Int) {
         viewModelScope.launch {
             manageTeamUseCase.removeFromTeam(pokemonId)
+            val slots = teamPreferences.getSlots()
+            val index = slots.indexOf(pokemonId)
+            if (index != -1) {
+                teamPreferences.clearSlot(index)
+            }
         }
     }
 }
@@ -85,5 +139,6 @@ data class PokelistState(
     val allPokemon: List<Pokemon> = emptyList(),
     val team: List<Pokemon> = emptyList(),
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
+    val errorTimestamp: Long = 0L
 )
