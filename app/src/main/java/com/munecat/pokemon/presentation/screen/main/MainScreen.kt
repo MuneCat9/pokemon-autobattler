@@ -80,7 +80,7 @@ fun MainScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onNavigateToBattle,
+                onClick = { onNavigateToBattle() },
                 enabled = state.isStartEnabled,
                 shape = RoundedCornerShape(50),
                 modifier = Modifier

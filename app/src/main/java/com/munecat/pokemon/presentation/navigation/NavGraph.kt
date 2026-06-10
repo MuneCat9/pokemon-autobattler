@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.munecat.pokemon.presentation.screen.battle.BattleScreen
 import com.munecat.pokemon.presentation.screen.main.MainScreen
 import com.munecat.pokemon.presentation.screen.pokelist.PokeListScreen
 
@@ -22,7 +23,7 @@ fun NavGraph(
                     navController.navigate(route = Screen.Pokelist.route)
                 },
                 onNavigateToBattle = {
-                    // TO DO !!!!!
+                    navController.navigate(route = Screen.Battle.route)
                 }
             )
         }
@@ -33,14 +34,16 @@ fun NavGraph(
                 }
             )
         }
-
-//        BATTLE SCREEN NAVIGATION
+        composable(Screen.Battle.route) {
+            BattleScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
     }
 }
 
 sealed class Screen (val route: String) {
     data object Main : Screen("main")
     data object Pokelist : Screen("poke_list")
-
     data object Battle : Screen("battle")
 }
