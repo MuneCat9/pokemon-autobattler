@@ -53,73 +53,84 @@ fun BattleScreen(
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadAndStartBattle()
+        viewModel.loadAllPokemon()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Battle") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+    if (state.isTeamSelectionVisible) {
+        TeamOrderSelection(
+            teamOrder = state.teamOrder,
+            opponentOrder = state.opponentOrder,
+            allPokemon = state.allPokemon.associateBy { it.id },
+            onSwapSlots = { index1, index2 -> viewModel.swapTeamSlots(index1, index2) },
+            onReady = { viewModel.confirmSelection() }
+        )
+    } else {
+
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Battle") },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            state.battleState?.let { battleState ->
-
-                OpponentCard(
-                    pokemon = battleState.opponentTeam[battleState.currentOpponentIndex],
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                BattleLog(
-                    log = battleState.battleLog,
-                    modifier = Modifier.weight(1f)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                PlayerCard(
-                    pokemon = battleState.playerTeam[battleState.currentPlayerIndex],
-                    modifier = Modifier.fillMaxWidth()
                 )
             }
-        }
-    }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+            ) {
+                state.battleState?.let { battleState ->
 
-    state.battleState?.let { battleState ->
-        if (battleState.isBattleOver) {
-            AlertDialog(
-                onDismissRequest = { },
-                title = {
-                    Text(
-                        text = if (battleState.playerWon == true) "Victory!" else "Defeat!",
-                        fontWeight = FontWeight.Bold
+                    OpponentCard(
+                        pokemon = battleState.opponentTeam[battleState.currentOpponentIndex],
+                        modifier = Modifier.fillMaxWidth()
                     )
-                },
-                text = {
-                    Text(if (battleState.playerWon == true) "You won the battle!" else "You lost the battle!")
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        viewModel.confirmResult()
-                        onBackClick()
-                    }) {
-                        Text("Accept")
-                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    BattleLog(
+                        log = battleState.battleLog,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    PlayerCard(
+                        pokemon = battleState.playerTeam[battleState.currentPlayerIndex],
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
-            )
+            }
+        }
+
+        state.battleState?.let { battleState ->
+            if (battleState.isBattleOver) {
+                AlertDialog(
+                    onDismissRequest = { },
+                    title = {
+                        Text(
+                            text = if (battleState.playerWon == true) "Victory!" else "Defeat!",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    text = {
+                        Text(if (battleState.playerWon == true) "You won the battle!" else "You lost the battle!")
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            viewModel.confirmResult()
+                            onBackClick()
+                        }) {
+                            Text("Accept")
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -131,7 +142,11 @@ fun OpponentCard(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f))
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer.copy(
+                alpha = 0.3f
+            )
+        )
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
@@ -175,7 +190,11 @@ fun PlayerCard(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f))
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
+                alpha = 0.3f
+            )
+        )
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
@@ -220,9 +239,9 @@ fun HpBar(
 ) {
     val hpFraction = if (maxHp > 0) currentHp.toFloat() / maxHp else 0f
     val barColor = when {
-        hpFraction > 0.5f -> Color(0xFF4CAF50) // Зелёный
-        hpFraction > 0.25f -> Color(0xFFFFC107) // Жёлтый
-        else -> Color(0xFFF44336) // Красный
+        hpFraction > 0.5f -> Color(0xFF4CAF50)
+        hpFraction > 0.25f -> Color(0xFFFFC107)
+        else -> Color(0xFFF44336)
     }
 
     Column {

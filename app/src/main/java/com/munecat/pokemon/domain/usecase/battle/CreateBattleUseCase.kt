@@ -10,12 +10,17 @@ import javax.inject.Inject
 class CreateBattleUseCase @Inject constructor(
     private val repository: PokemonRepository
 ) {
-    suspend operator fun invoke(playerTeam: List<Pokemon>): BattleState {
+    suspend operator fun invoke(
+        playerTeam: List<Pokemon>,
+        opponentIds: List<Int>? = null
+    ): BattleState {
         val allPokemon = repository.getAllPokemon().first()
 
-        val opponentTeam = allPokemon.shuffled().take(3).map {
-            BattlePokemon.fromPokemon(it)
-        }
+        val opponentTeam = if (opponentIds != null) {
+            opponentIds.mapNotNull { id -> allPokemon.find { it.id == id } }
+        } else {
+            allPokemon.shuffled().take(3)
+        }.map { BattlePokemon.fromPokemon(it) }
 
         val playerBattleTeam = playerTeam.map { BattlePokemon.fromPokemon(it) }
 
