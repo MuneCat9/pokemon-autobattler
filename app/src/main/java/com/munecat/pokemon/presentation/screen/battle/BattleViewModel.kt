@@ -47,13 +47,12 @@ class BattleViewModel @Inject constructor(
             val playerTeam = repository.getTeam().first()
             val allPokemon = repository.getAllPokemon().first()
 
-            // Получаем порядок из DataStore
             val slots = teamPreferences.getSlots()
             val orderedTeam = slots.mapNotNull { slotId ->
                 if (slotId == TeamPreferences.EMPTY_SLOT) null
                 else playerTeam.find { it.id == slotId }
             }
-            // Добавляем покемонов, которых нет в слотах (на всякий случай)
+
             val completeTeam = orderedTeam + playerTeam.filter { it.id !in slots }
 
             val opponentTeam = allPokemon.shuffled().take(3)
