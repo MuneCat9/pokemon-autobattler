@@ -1,5 +1,6 @@
 package com.munecat.pokemon.presentation.screen.battle
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -37,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -149,7 +152,7 @@ fun OpponentCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(8.dp)
         ) {
 
             HpBar(
@@ -158,15 +161,29 @@ fun OpponentCard(
                 name = pokemon.pokemon.name
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 16.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        pokemon.pokemon.types.forEach { type ->
+                            Image(
+                                painter = painterResource(getTypeIcon(type)),
+                                contentDescription = type,
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
+                    }
 
-                Column {
-                    StatText("Type: ${pokemon.pokemon.types.joinToString(", ")}")
                     StatText("Attack: ${pokemon.pokemon.attack}")
                     StatText("Defense: ${pokemon.pokemon.defense}")
                     StatText("Speed: ${pokemon.pokemon.speed}")
@@ -175,13 +192,17 @@ fun OpponentCard(
                 AsyncImage(
                     model = pokemon.pokemon.imageUrl,
                     contentDescription = pokemon.pokemon.name,
-                    modifier = Modifier.size(100.dp),
+                    modifier = Modifier
+                        .size(100.dp),
                     contentScale = ContentScale.Fit
                 )
+
+                Spacer(modifier = Modifier.width(40.dp))
             }
         }
     }
 }
+
 
 @Composable
 fun PlayerCard(
@@ -197,7 +218,7 @@ fun PlayerCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(8.dp)
         ) {
 
             HpBar(
@@ -206,22 +227,39 @@ fun PlayerCard(
                 name = pokemon.pokemon.name
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Spacer(modifier = Modifier.width(40.dp))
 
                 AsyncImage(
                     model = pokemon.pokemon.imageUrl,
                     contentDescription = pokemon.pokemon.name,
-                    modifier = Modifier.size(100.dp),
+                    modifier = Modifier
+                        .size(90.dp),
                     contentScale = ContentScale.Fit
                 )
 
-                Column(horizontalAlignment = Alignment.End) {
-                    StatText("Type: ${pokemon.pokemon.types.joinToString(", ")}")
+                Column(
+                    modifier = Modifier.weight(1f)
+                        .padding(end = 16.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        pokemon.pokemon.types.forEach { type ->
+                            Image(
+                                painter = painterResource(getTypeIcon(type)),
+                                contentDescription = type,
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
+                    }
+
                     StatText("Attack: ${pokemon.pokemon.attack}")
                     StatText("Defense: ${pokemon.pokemon.defense}")
                     StatText("Speed: ${pokemon.pokemon.speed}")
@@ -230,6 +268,7 @@ fun PlayerCard(
         }
     }
 }
+
 
 @Composable
 fun HpBar(
