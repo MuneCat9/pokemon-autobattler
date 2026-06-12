@@ -3,6 +3,8 @@ package com.munecat.pokemon.domain.usecase.battle
 import com.munecat.pokemon.domain.model.battle.BattleAction
 import com.munecat.pokemon.domain.model.battle.BattlePokemon
 import com.munecat.pokemon.domain.model.battle.BattleState
+import com.munecat.pokemon.domain.model.battle.PokemonType
+import com.munecat.pokemon.domain.model.battle.TypeEffectiveness
 import javax.inject.Inject
 
 class ExecuteTurnUseCase @Inject constructor() {
@@ -14,7 +16,22 @@ class ExecuteTurnUseCase @Inject constructor() {
 
         val baseDamage = (attacker.pokemon.attack * 0.8).toInt()
         val defenseReduction = (defender.pokemon.defense * 0.5).toInt()
-        val damage = (baseDamage - defenseReduction).coerceAtLeast(1)
+
+        val attackerTypes = attacker.pokemon.types.mapNotNull { PokemonType.fromString(it) }
+        val defenderTypes = defender.pokemon.types.mapNotNull { PokemonType.fromString(it) }
+
+        val typeMultiplier = attackerTypes.maxOfOrNull { attackerType ->
+            TypeEffectiveness.getMultiplier(attackerType, defenderTypes)
+        } ?: 1f
+
+        val damage = ((baseDamage - defenseReduction) * typeMultiplier).toInt().coerceAtLeast(1)
+
+        val effectivenessText = when {
+            typeMultiplier > 1f -> "It's super effective! "
+            typeMultiplier < 1f && typeMultiplier >= 0.75f -> "It's not very effective... "
+            typeMultiplier < 0.75f -> "It's barely effective... "
+            else -> ""
+        }
 
         val newHp = (defender.currentHp - damage).coerceAtLeast(0)
         val updatedDefender = defender.copy(
@@ -28,7 +45,7 @@ class ExecuteTurnUseCase @Inject constructor() {
             damage = damage
         )
 
-        val logMessage = "${attacker.pokemon.name} dealt $damage damage to ${defender.pokemon.name}"
+        val logMessage = "$effectivenessText${attacker.pokemon.name} dealt $damage damage to ${defender.pokemon.name}"
 
         val newPlayerTeam = if (isPlayerAttacking) {
             state.playerTeam.toMutableList().also { it[state.currentPlayerIndex] = attacker }
@@ -53,7 +70,6 @@ class ExecuteTurnUseCase @Inject constructor() {
             )
         }
 
-        // Следующий ход
         return state.copy(
             playerTeam = newPlayerTeam,
             opponentTeam = newOpponentTeam,

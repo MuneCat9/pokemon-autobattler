@@ -190,11 +190,6 @@ fun PlayerSlot(
                 }
             }
     ) {
-        Text(
-            "Slot ${index + 1}",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold
-        )
 
         Card(
             modifier = Modifier
