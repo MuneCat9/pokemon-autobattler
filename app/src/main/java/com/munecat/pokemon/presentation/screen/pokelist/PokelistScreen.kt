@@ -51,6 +51,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.munecat.pokemon.R
 import com.munecat.pokemon.domain.model.Pokemon
+import com.munecat.pokemon.presentation.screen.components.PokemonInfoDialog
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +61,7 @@ fun PokeListScreen(
     viewModel: PokelistViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    var selectedPokemon by remember { mutableStateOf<Pokemon?>(null) }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -79,7 +81,7 @@ fun PokeListScreen(
                         }
                     },
                     actions = {
-                        // TO DO !!!!!!!!!!!!!!
+
                         IconButton(
                             onClick = { }) {
                             Icon(
@@ -120,7 +122,8 @@ fun PokeListScreen(
                                             pokemon
                                         )
                                     )
-                                }
+                                },
+                                onItemClick = { selectedPokemon = pokemon }
                             )
                         }
                     }
@@ -168,6 +171,12 @@ fun PokeListScreen(
                 }
             }
         }
+        selectedPokemon?.let { pokemon ->
+            PokemonInfoDialog(
+                pokemon = pokemon,
+                onDismiss = { selectedPokemon = null }
+            )
+        }
     }
 }
 
@@ -186,7 +195,7 @@ fun PokemonListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onItemClick() }                            // TO DO !!!!
+                .clickable { onItemClick() }
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

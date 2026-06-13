@@ -1,6 +1,7 @@
 package com.munecat.pokemon.presentation.screen.battle
 
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import com.munecat.pokemon.domain.model.Pokemon
+import com.munecat.pokemon.presentation.screen.components.PokemonInfoDialog
 import kotlin.math.roundToInt
 
 
@@ -47,6 +49,8 @@ fun TeamOrderSelection(
     onReady: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var selectedPokemon by remember { mutableStateOf<Pokemon?>(null) }
+
     var draggingIndex by remember { mutableStateOf(-1) }
     var targetIndex by remember { mutableStateOf(-1) }
 
@@ -78,7 +82,12 @@ fun TeamOrderSelection(
             opponentOrder.forEach { id ->
                 val pokemon = allPokemon[id]
                 if (pokemon != null) {
-                    OpponentSlot(pokemon = pokemon)
+                    OpponentSlot(
+                        pokemon = pokemon,
+                        onClick = {
+                            selectedPokemon = pokemon
+                        }
+                    )
                 }
             }
         }
@@ -119,7 +128,8 @@ fun TeamOrderSelection(
                             if (targetIdx != index) {
                                 targetIndex = targetIdx
                             }
-                        }
+                        },
+                        onClick = { selectedPokemon = pokemon }
                     )
                 }
             }
@@ -136,6 +146,12 @@ fun TeamOrderSelection(
             Text("Ready!", fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
     }
+    selectedPokemon?.let { pokemon ->
+        PokemonInfoDialog(
+            pokemon = pokemon,
+            onDismiss = { selectedPokemon = null }
+        )
+    }
 }
 
 @Composable
@@ -147,7 +163,8 @@ fun PlayerSlot(
     onDragStart: () -> Unit,
     onDragEnd: () -> Unit,
     onDragCancel: () -> Unit,
-    onDragOver: (Int) -> Unit = {}
+    onDragOver: (Int) -> Unit = {},
+    onClick: () -> Unit = {}
 ) {
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
@@ -194,7 +211,8 @@ fun PlayerSlot(
         Card(
             modifier = Modifier
                 .size(100.dp)
-                .padding(4.dp),
+                .padding(4.dp)
+                .clickable { onClick() },
             colors = CardDefaults.cardColors(
                 containerColor = when {
                     isDragging -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
@@ -221,14 +239,18 @@ fun PlayerSlot(
 }
 
 @Composable
-fun OpponentSlot(pokemon: Pokemon) {
+fun OpponentSlot(
+    pokemon: Pokemon,
+    onClick: () -> Unit = {}
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
             modifier = Modifier
                 .size(80.dp)
-                .padding(4.dp),
+                .padding(4.dp)
+                .clickable { onClick() },
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
         ) {
             Box(
