@@ -1,8 +1,10 @@
 package com.munecat.pokemon.domain.usecase.battle
 
 import com.munecat.pokemon.domain.model.battle.BattleAction
+import com.munecat.pokemon.domain.model.battle.BattleLogEntry
 import com.munecat.pokemon.domain.model.battle.BattlePokemon
 import com.munecat.pokemon.domain.model.battle.BattleState
+import com.munecat.pokemon.domain.model.battle.LogType
 import com.munecat.pokemon.domain.model.battle.PokemonType
 import com.munecat.pokemon.domain.model.battle.TypeEffectiveness
 import javax.inject.Inject
@@ -14,8 +16,7 @@ class ExecuteTurnUseCase @Inject constructor() {
 
         val (attacker, defender, isPlayerAttacking) = getAttackerAndDefender(state)
 
-        val baseDamage = (attacker.pokemon.attack * 0.8).toInt()
-        val defenseReduction = (defender.pokemon.defense * 0.5).toInt()
+        val baseDamage = (attacker.pokemon.attack * 0.2).toInt()
 
         val attackerTypes = attacker.pokemon.types.mapNotNull { PokemonType.fromString(it) }
         val defenderTypes = defender.pokemon.types.mapNotNull { PokemonType.fromString(it) }
@@ -24,7 +25,20 @@ class ExecuteTurnUseCase @Inject constructor() {
             TypeEffectiveness.getMultiplier(attackerType, defenderTypes)
         } ?: 1f
 
-        val damage = ((baseDamage - defenseReduction) * typeMultiplier).toInt().coerceAtLeast(1)
+        val defenseRatio = defender.pokemon.defense / 200f
+        val effectiveDefense = when {
+            typeMultiplier > 1f -> defenseRatio * 0.5f
+            typeMultiplier < 1f -> defenseRatio * 1.5f
+            else -> defenseRatio
+        }.coerceIn(0f, 0.85f)
+
+        val damageAfterDefense = (baseDamage * typeMultiplier * (1f - effectiveDefense)).toInt().coerceAtLeast(1)
+
+        val speedRatio = attacker.pokemon.speed / 150f
+        val variancePercent = ((1f - speedRatio) * 0.30f + 0.05f)
+        val variance = (damageAfterDefense * variancePercent).toInt()
+        val randomFactor = if (variance > 0) (-variance..variance).random() else 0
+        val finalDamage = (damageAfterDefense + randomFactor).coerceAtLeast(1)
 
         val effectivenessText = when {
             typeMultiplier > 1f -> "It's super effective! "
@@ -33,7 +47,22 @@ class ExecuteTurnUseCase @Inject constructor() {
             else -> ""
         }
 
-        val newHp = (defender.currentHp - damage).coerceAtLeast(0)
+        val logType = when {
+            typeMultiplier > 1f -> LogType.SUPER_EFFECTIVE
+            typeMultiplier < 1f -> LogType.NOT_EFFECTIVE
+            randomFactor > damageAfterDefense * 0.15 -> LogType.HIGH_ROLL
+            randomFactor < -damageAfterDefense * 0.15 -> LogType.LOW_ROLL
+            else -> LogType.NEUTRAL
+        }
+
+        val logMessage = "$effectivenessText${attacker.pokemon.name} dealt $finalDamage damage to ${defender.pokemon.name}"
+
+        val logEntry = BattleLogEntry(
+            message = logMessage,
+            type = logType
+        )
+
+        val newHp = (defender.currentHp - finalDamage).coerceAtLeast(0)
         val updatedDefender = defender.copy(
             currentHp = newHp,
             isFainted = newHp <= 0
@@ -42,10 +71,8 @@ class ExecuteTurnUseCase @Inject constructor() {
         val action = BattleAction.Attack(
             attacker = attacker,
             defender = updatedDefender,
-            damage = damage
+            damage = finalDamage
         )
-
-        val logMessage = "$effectivenessText${attacker.pokemon.name} dealt $damage damage to ${defender.pokemon.name}"
 
         val newPlayerTeam = if (isPlayerAttacking) {
             state.playerTeam.toMutableList().also { it[state.currentPlayerIndex] = attacker }
@@ -66,14 +93,14 @@ class ExecuteTurnUseCase @Inject constructor() {
         if (updatedDefender.isFainted) {
             return handleFaintedPokemon(
                 state, newPlayerTeam, newOpponentTeam,
-                updatedDefender, isPlayerAttacking, logMessage
+                updatedDefender, isPlayerAttacking, logEntry
             )
         }
 
         return state.copy(
             playerTeam = newPlayerTeam,
             opponentTeam = newOpponentTeam,
-            battleLog = state.battleLog + logMessage,
+            battleLog = state.battleLog + logEntry,
             isPlayerTurn = !isPlayerAttacking
         )
     }
@@ -100,19 +127,27 @@ class ExecuteTurnUseCase @Inject constructor() {
         opponentTeam: List<BattlePokemon>,
         fainted: BattlePokemon,
         wasPlayerAttacking: Boolean,
-        logMessage: String
+        logEntry: BattleLogEntry
     ): BattleState {
         val faintedName = fainted.pokemon.name
-        val faintedLog = "$faintedName fainted!"
+
+        val faintedEntry = BattleLogEntry(
+            message = "$faintedName fainted!",
+            type = LogType.FAINTED
+        )
 
         val allOpponentsFainted = opponentTeam.all { it.isFainted }
         val allPlayersFainted = playerTeam.all { it.isFainted }
 
         if (allOpponentsFainted || allPlayersFainted) {
+            val battleOverEntry = BattleLogEntry(
+                message = "Battle over!",
+                type = LogType.NEUTRAL
+            )
             return state.copy(
                 playerTeam = playerTeam,
                 opponentTeam = opponentTeam,
-                battleLog = state.battleLog + logMessage + faintedLog + "Battle over!",
+                battleLog = state.battleLog + logEntry + faintedEntry + battleOverEntry,
                 isBattleOver = true,
                 playerWon = allOpponentsFainted
             )
@@ -139,7 +174,7 @@ class ExecuteTurnUseCase @Inject constructor() {
         return state.copy(
             playerTeam = playerTeam,
             opponentTeam = opponentTeam,
-            battleLog = state.battleLog + logMessage + faintedLog,
+            battleLog = state.battleLog + logEntry + faintedEntry,
             isPlayerTurn = nextIsPlayerTurn,
             currentPlayerIndex = nextPlayerIndex,
             currentOpponentIndex = nextOpponentIndex

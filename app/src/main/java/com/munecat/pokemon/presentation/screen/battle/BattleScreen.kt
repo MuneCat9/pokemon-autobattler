@@ -40,12 +40,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
+import com.munecat.pokemon.domain.model.battle.BattleLogEntry
 import com.munecat.pokemon.domain.model.battle.BattlePokemon
+import com.munecat.pokemon.domain.model.battle.LogType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -320,7 +325,7 @@ fun StatText(text: String) {
 
 @Composable
 fun BattleLog(
-    log: List<String>,
+    log: List<BattleLogEntry>,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
@@ -339,13 +344,75 @@ fun BattleLog(
             state = listState,
             modifier = Modifier.padding(8.dp)
         ) {
-            items(log) { message ->
+            items(log) { entry ->
                 Text(
-                    text = message,
-                    fontSize = 12.sp,
+                    text = buildAnnotatedString(entry),
+                    fontSize = 16.sp,
                     modifier = Modifier.padding(vertical = 2.dp)
                 )
             }
         }
+    }
+}
+
+private fun buildAnnotatedString(entry: BattleLogEntry): AnnotatedString {
+    return with(AnnotatedString.Builder()) {
+        val message = entry.message
+
+        val pokemonName = when {
+            " dealt " in message -> message.substringBefore(" dealt ")
+            " fainted" in message -> message.substringBefore(" fainted!")
+            else -> ""
+        }
+
+        val damagePattern = Regex("""(\d+) damage""")
+        val damageMatch = damagePattern.find(message)
+        val damageValue = damageMatch?.groupValues?.get(1) ?: ""
+
+        if (pokemonName.isNotEmpty() && damageValue.isNotEmpty()) {
+            val beforeName = message.substringBefore(pokemonName)
+            val afterName = message.substringAfter(pokemonName).substringBefore(damageValue)
+            val afterDamage = message.substringAfter("$damageValue damage")
+
+            append(beforeName)
+
+            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(pokemonName)
+            }
+
+            append(afterName)
+
+            withStyle(
+                SpanStyle(
+                    color = when (entry.type) {
+                        LogType.HIGH_ROLL -> Color(0xFFFF4444)
+                        LogType.LOW_ROLL -> Color(0xFFAAAAAA)
+                        LogType.SUPER_EFFECTIVE -> Color(0xFF4CAF50)
+                        LogType.NOT_EFFECTIVE -> Color(0xFFFF9800)
+                        else -> Color.Unspecified
+                    },
+                    fontWeight = if (entry.type == LogType.HIGH_ROLL) FontWeight.Bold else FontWeight.Normal
+                )
+            ) {
+                append(damageValue)
+            }
+
+            append(" damage")
+            append(afterDamage)
+        } else {
+            withStyle(
+                SpanStyle(
+                    color = when (entry.type) {
+                        LogType.FAINTED -> Color(0xFFF44336)
+                        else -> Color.Unspecified
+                    },
+                    fontWeight = if (entry.type == LogType.FAINTED) FontWeight.Bold else FontWeight.Normal
+                )
+            ) {
+                append(message)
+            }
+        }
+
+        toAnnotatedString()
     }
 }

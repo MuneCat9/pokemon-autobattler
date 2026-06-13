@@ -104,7 +104,7 @@ class BattleViewModel @Inject constructor(
     private fun runAutoBattle() {
         viewModelScope.launch {
             while (!_state.value.battleState?.isBattleOver!!) {
-                delay(1500)
+                delay(2000)
                 val currentState = _state.value.battleState ?: break
                 val newState = executeTurnUseCase(currentState)
                 _state.update { it.copy(battleState = newState) }
