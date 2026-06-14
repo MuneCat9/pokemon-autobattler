@@ -40,6 +40,23 @@ class ExecuteTurnUseCase @Inject constructor() {
         val randomFactor = if (variance > 0) (-variance..variance).random() else 0
         val finalDamage = (damageAfterDefense + randomFactor).coerceAtLeast(1)
 
+        val dodgeChance = calculateDodgeChance(attacker, defender)
+        val isDodged = (1..100).random() <= dodgeChance
+
+        if (isDodged) {
+            val dodgeEntry = BattleLogEntry(
+                message = "${defender.pokemon.name} dodged attack from ${attacker.pokemon.name}",
+                type = LogType.DODGED
+            )
+
+            return state.copy(
+                playerTeam = state.playerTeam,
+                opponentTeam = state.opponentTeam,
+                battleLog = state.battleLog + dodgeEntry,
+                isPlayerTurn = !isPlayerAttacking
+            )
+        }
+
         val effectivenessText = when {
             typeMultiplier > 1f -> "It's super effective! "
             typeMultiplier < 1f && typeMultiplier >= 0.75f -> "It's not very effective... "
@@ -179,5 +196,19 @@ class ExecuteTurnUseCase @Inject constructor() {
             currentPlayerIndex = nextPlayerIndex,
             currentOpponentIndex = nextOpponentIndex
         )
+    }
+
+    private fun calculateDodgeChance(
+        attacker: BattlePokemon,
+        defender: BattlePokemon
+    ): Int {
+        val baseChance = 25f
+        val attackerSpeed = attacker.pokemon.speed.toFloat()
+        val defenderSpeed = defender.pokemon.speed.toFloat()
+
+        val speedRatio = (defenderSpeed / attackerSpeed).coerceIn(0.5f, 1.5f)
+        val finalChance = (baseChance * speedRatio).toInt().coerceIn(5, 50)
+
+        return finalChance
     }
 }

@@ -249,7 +249,8 @@ fun PlayerCard(
                 )
 
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .padding(end = 16.dp),
                     horizontalAlignment = Alignment.End
                 ) {
@@ -389,6 +390,7 @@ private fun buildAnnotatedString(entry: BattleLogEntry): AnnotatedString {
                         LogType.LOW_ROLL -> Color(0xFFAAAAAA)
                         LogType.SUPER_EFFECTIVE -> Color(0xFF4CAF50)
                         LogType.NOT_EFFECTIVE -> Color(0xFFFF9800)
+                        LogType.DODGED -> Color(0xFF42A5F5)
                         else -> Color.Unspecified
                     },
                     fontWeight = if (entry.type == LogType.HIGH_ROLL) FontWeight.Bold else FontWeight.Normal
@@ -399,11 +401,30 @@ private fun buildAnnotatedString(entry: BattleLogEntry): AnnotatedString {
 
             append(" damage")
             append(afterDamage)
+
+        } else if (" dodged " in message) {
+            val dodger = message.substringBefore(" dodged ")
+            val afterDodged = message.substringAfter(" dodged ")
+
+            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(dodger)
+            }
+
+            withStyle(SpanStyle(
+                color = Color(0xFF42A5F5),
+                fontWeight = FontWeight.Bold
+            )) {
+                append(" dodged ")
+            }
+
+            append(afterDodged)
+
         } else {
             withStyle(
                 SpanStyle(
                     color = when (entry.type) {
                         LogType.FAINTED -> Color(0xFFF44336)
+                        LogType.DODGED -> Color(0xFF42A5F5)
                         else -> Color.Unspecified
                     },
                     fontWeight = if (entry.type == LogType.FAINTED) FontWeight.Bold else FontWeight.Normal

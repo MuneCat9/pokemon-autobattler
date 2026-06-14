@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.munecat.pokemon.R
 import com.munecat.pokemon.domain.model.Pokemon
+import com.munecat.pokemon.presentation.screen.battle.getTypeSmallIcon
 import com.munecat.pokemon.presentation.screen.components.PokemonInfoDialog
 import kotlinx.coroutines.delay
 
@@ -223,6 +225,19 @@ fun PokemonListItem(
                 fontSize = 16.sp,
                 modifier = Modifier.weight(1f)
             )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                pokemon.types.forEach { type ->
+                    Image(
+                        painter = painterResource(getTypeSmallIcon(type)),
+                        contentDescription = type,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
 
             if (!isInTeam) {
                 Icon(

@@ -22,5 +22,6 @@ enum class LogType {
     LOW_ROLL,
     SUPER_EFFECTIVE,
     NOT_EFFECTIVE,
-    FAINTED
+    FAINTED,
+    DODGED
 }
