@@ -81,4 +81,5 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     runtimeOnly(libs.coil.svg)
     implementation(libs.coil3.coil.svg)
+    implementation(libs.coil.gif)
 }

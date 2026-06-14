@@ -1,7 +1,7 @@
 package com.munecat.pokemon.data.remote.dto
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class PokemonDetailResponse(
@@ -21,18 +21,53 @@ data class PokemonDetailResponse(
         @SerialName("other")
         val other: Other,
         @SerialName("front_default")
-        val frontDefault: String? = null
+        val frontDefault: String? = null,
+        @SerialName("versions")
+        val versions: Versions? = null
     ) {
         @Serializable
         data class Other(
             @SerialName("dream_world")
-            val dreamWorld: DreamWorld
+            val dreamWorld: DreamWorld,
+            @SerialName("showdown")
+            val showdown: Showdown? = null
         ) {
             @Serializable
             data class DreamWorld(
                 @SerialName("front_default")
                 val frontDefault: String?
             )
+            @Serializable
+            data class Showdown(
+                @SerialName("front_default")
+                val frontDefault: String?
+            )
+        }
+    }
+
+    @Serializable
+    data class Versions(
+        @SerialName("generation-v")
+        val generationV: GenerationV? = null
+    ) {
+        @Serializable
+        data class GenerationV(
+            @SerialName("black-white")
+            val blackWhite: BlackWhite? = null
+        ) {
+            @Serializable
+            data class BlackWhite(
+                @SerialName("animated")
+                val animated: Animated? = null
+            ) {
+                @Serializable
+                data class Animated(
+                    @SerialName("front_default")
+                    val frontDefault: String?,
+                    @SerialName("back_default")
+                    val backDefault: String?
+                )
+            }
         }
     }
 

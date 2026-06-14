@@ -136,7 +136,7 @@ fun TeamSlots(
                 ) {
                     if (i < team.size) {
                         AsyncImage(
-                            model = team[i].imageUrl,
+                            model = team[i].cardImageUrl,
                             contentDescription = team[i].name,
                             modifier = Modifier
                                 .fillMaxSize(0.8f),

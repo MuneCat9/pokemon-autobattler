@@ -226,7 +226,7 @@ fun PlayerSlot(
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-                    model = pokemon.imageUrl,
+                    model = pokemon.cardImageUrl,
                     contentDescription = pokemon.name,
                     modifier = Modifier.fillMaxSize(0.8f)
                 )
@@ -248,7 +248,7 @@ fun OpponentSlot(
     ) {
         Card(
             modifier = Modifier
-                .size(80.dp)
+                .size(100.dp)
                 .padding(4.dp)
                 .clickable { onClick() },
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
@@ -258,7 +258,7 @@ fun OpponentSlot(
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-                    model = pokemon.imageUrl,
+                    model = pokemon.cardImageUrl,
                     contentDescription = pokemon.name,
                     modifier = Modifier.fillMaxSize(0.8f)
                 )

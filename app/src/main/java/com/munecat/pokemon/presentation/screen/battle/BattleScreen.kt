@@ -77,7 +77,12 @@ fun BattleScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Battle") },
+                    title = {
+                        Text(
+                            modifier = Modifier.padding(start = 94.dp),
+                            text = "Battle"
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = onBackClick) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -195,7 +200,7 @@ fun OpponentCard(
                 }
 
                 AsyncImage(
-                    model = pokemon.pokemon.imageUrl,
+                    model = pokemon.pokemon.battleFrontUrl,
                     contentDescription = pokemon.pokemon.name,
                     modifier = Modifier
                         .size(100.dp),
@@ -241,7 +246,7 @@ fun PlayerCard(
                 Spacer(modifier = Modifier.width(40.dp))
 
                 AsyncImage(
-                    model = pokemon.pokemon.imageUrl,
+                    model = pokemon.pokemon.battleBackUrl,
                     contentDescription = pokemon.pokemon.name,
                     modifier = Modifier
                         .size(90.dp),
@@ -410,10 +415,12 @@ private fun buildAnnotatedString(entry: BattleLogEntry): AnnotatedString {
                 append(dodger)
             }
 
-            withStyle(SpanStyle(
-                color = Color(0xFF42A5F5),
-                fontWeight = FontWeight.Bold
-            )) {
+            withStyle(
+                SpanStyle(
+                    color = Color(0xFF42A5F5),
+                    fontWeight = FontWeight.Bold
+                )
+            ) {
                 append(" dodged ")
             }
 

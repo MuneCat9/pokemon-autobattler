@@ -56,7 +56,7 @@ fun PokemonInfoDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 AsyncImage(
-                    model = pokemon.imageUrl,
+                    model = pokemon.cardImageUrl,
                     contentDescription = pokemon.name,
                     modifier = Modifier.size(120.dp),
                     contentScale = ContentScale.Fit

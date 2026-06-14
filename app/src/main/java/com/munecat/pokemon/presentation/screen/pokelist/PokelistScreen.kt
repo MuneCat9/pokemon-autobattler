@@ -136,6 +136,9 @@ fun PokeListScreen(
                     onRemoveClick = { pokemonId ->
                         viewModel.processCommand(PokelistCommand.RemoveFromTeam(pokemonId = pokemonId))
                     },
+                    onPokemonClick = { pokemon ->
+                        selectedPokemon = pokemon
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
@@ -192,13 +195,13 @@ fun PokemonListItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .padding(horizontal = 16.dp, vertical = 2.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onItemClick() }
-                .padding(16.dp),
+                .padding(horizontal = 12.dp, vertical = 0.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -212,7 +215,7 @@ fun PokemonListItem(
                 model = pokemon.imageUrl,
                 contentDescription = pokemon.name,
                 modifier = Modifier
-                    .size(40.dp),
+                    .size(56.dp),
                 contentScale = ContentScale.Fit,
                 placeholder = painterResource(R.drawable.pokeball_placeholder),
                 error = painterResource(R.drawable.pokeball_error)
@@ -234,7 +237,7 @@ fun PokemonListItem(
                     Image(
                         painter = painterResource(getTypeSmallIcon(type)),
                         contentDescription = type,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -257,7 +260,8 @@ fun PokemonListItem(
 fun TeamSlots(
     modifier: Modifier = Modifier,
     team: List<Pokemon>,
-    onRemoveClick: (Int) -> Unit
+    onRemoveClick: (Int) -> Unit,
+    onPokemonClick: (Pokemon) -> Unit = {}
 ) {
     Row(
         modifier = modifier,
@@ -281,7 +285,8 @@ fun TeamSlots(
                             model = team[i].imageUrl,
                             contentDescription = team[i].name,
                             modifier = Modifier
-                                .fillMaxSize(0.8f),
+                                .fillMaxSize(1f)
+                                .clickable { onPokemonClick(team[i]) },
                             contentScale = ContentScale.Fit
                         )
                         IconButton(
