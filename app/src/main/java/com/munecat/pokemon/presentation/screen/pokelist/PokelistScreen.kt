@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
@@ -101,6 +102,7 @@ fun PokeListScreen(
                 if (state.isSortAscending) result.sortedBy { it.id }
                 else result.sortedByDescending { it.id }
             }
+
             SortMode.BY_NAME -> {
                 if (state.isSortAscending) result.sortedBy { it.name.lowercase() }
                 else result.sortedByDescending { it.name.lowercase() }
@@ -332,17 +334,17 @@ fun PokemonListItem(
                     )
                 }
             }
-
-            if (!isInTeam) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add to team",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable {
-                        onAddClick()
-                    }
-                )
-            }
+            Icon(
+                imageVector = if (isInTeam) Icons.Default.Check else Icons.Default.Add,
+                contentDescription = if (isInTeam) "In team" else "Add to team",
+                tint = if (isInTeam) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .size(24.dp)
+                    .then(
+                        if (isInTeam) Modifier
+                        else Modifier.clickable { onAddClick() }
+                    )
+            )
         }
     }
 }
@@ -450,13 +452,13 @@ fun FilterContent(
             FilterChip(
                 selected = sortMode == SortMode.BY_NUMBER,
                 onClick = { onSortModeChanged(SortMode.BY_NUMBER) },
-                label = { Text("Number") }
+                label = { Text("1-151") }
             )
             Spacer(modifier = Modifier.width(8.dp))
             FilterChip(
                 selected = sortMode == SortMode.BY_NAME,
                 onClick = { onSortModeChanged(SortMode.BY_NAME) },
-                label = { Text("Name") }
+                label = { Text("A-Z") }
             )
         }
 
