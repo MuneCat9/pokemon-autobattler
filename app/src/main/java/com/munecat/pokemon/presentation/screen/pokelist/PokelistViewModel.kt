@@ -128,6 +128,10 @@ class PokelistViewModel @Inject constructor(
             }
         }
     }
+
+    fun onSearchQueryChanged(query: String) {
+        _state.update { it.copy(searchQuery = query) }
+    }
 }
 
 sealed interface PokelistCommand {
@@ -140,5 +144,6 @@ data class PokelistState(
     val team: List<Pokemon> = emptyList(),
     val isLoading: Boolean = true,
     val error: String? = null,
-    val errorTimestamp: Long = 0L
+    val errorTimestamp: Long = 0L,
+    val searchQuery: String = ""
 )

@@ -14,16 +14,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,6 +34,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -43,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,6 +70,15 @@ fun PokeListScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var selectedPokemon by remember { mutableStateOf<Pokemon?>(null) }
+    val filteredPokemon = remember(state.allPokemon, state.searchQuery) {
+        if (state.searchQuery.isBlank()) {
+            state.allPokemon
+        } else {
+            state.allPokemon.filter {
+                it.name.contains(state.searchQuery, ignoreCase = true)
+            }
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -83,7 +98,6 @@ fun PokeListScreen(
                         }
                     },
                     actions = {
-
                         IconButton(
                             onClick = { }) {
                             Icon(
@@ -100,6 +114,37 @@ fun PokeListScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
+                OutlinedTextField(
+                    value = state.searchQuery,
+                    onValueChange = { viewModel.onSearchQueryChanged(it) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 0.dp),
+                    placeholder = { Text("Find a pokemon") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = "Search"
+                        )
+                    },
+                    trailingIcon = {
+                        if (state.searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.onSearchQueryChanged("") }) {
+                                Icon(Icons.Default.Close, contentDescription = "Clear")
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(24.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Red,
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = Color.Red
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 if (state.isLoading) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -112,7 +157,7 @@ fun PokeListScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         items(
-                            items = state.allPokemon,
+                            items = filteredPokemon,
                             key = { it.id }
                         ) { pokemon ->
                             PokemonListItem(
