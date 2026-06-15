@@ -24,6 +24,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
@@ -31,13 +33,16 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,15 +75,39 @@ fun PokeListScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var selectedPokemon by remember { mutableStateOf<Pokemon?>(null) }
-    val filteredPokemon = remember(state.allPokemon, state.searchQuery) {
-        if (state.searchQuery.isBlank()) {
-            state.allPokemon
-        } else {
-            state.allPokemon.filter {
+    val filteredPokemon = remember(
+        state.allPokemon,
+        state.searchQuery,
+        state.selectedTypes,
+        state.sortMode,
+        state.isSortAscending
+    ) {
+        var result = state.allPokemon
+
+        if (state.searchQuery.isNotBlank()) {
+            result = result.filter {
                 it.name.contains(state.searchQuery, ignoreCase = true)
             }
         }
+
+        if (state.selectedTypes.isNotEmpty()) {
+            result = result.filter { pokemon ->
+                pokemon.types.any { it in state.selectedTypes }
+            }
+        }
+
+        when (state.sortMode) {
+            SortMode.BY_NUMBER -> {
+                if (state.isSortAscending) result.sortedBy { it.id }
+                else result.sortedByDescending { it.id }
+            }
+            SortMode.BY_NAME -> {
+                if (state.isSortAscending) result.sortedBy { it.name.lowercase() }
+                else result.sortedByDescending { it.name.lowercase() }
+            }
+        }
     }
+    var showFilterSheet by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -98,8 +127,7 @@ fun PokeListScreen(
                         }
                     },
                     actions = {
-                        IconButton(
-                            onClick = { }) {
+                        IconButton(onClick = { showFilterSheet = true }) {
                             Icon(
                                 imageVector = Icons.Default.FilterList,
                                 contentDescription = "Filter"
@@ -219,6 +247,24 @@ fun PokeListScreen(
                             .padding(32.dp)
                     )
                 }
+            }
+        }
+        if (showFilterSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showFilterSheet = false }
+            ) {
+                FilterContent(
+                    selectedTypes = state.selectedTypes,
+                    sortMode = state.sortMode,
+                    isSortAscending = state.isSortAscending,
+                    onTypeFilterChanged = { viewModel.onTypeFilterChanged(it) },
+                    onSortModeChanged = { viewModel.onSortModeChanged(it) },
+                    onToggleSortDirection = { viewModel.onToggleSortDirection() },
+                    onClearFilters = {
+                        viewModel.clearFilters()
+                        showFilterSheet = false
+                    }
+                )
             }
         }
         selectedPokemon?.let { pokemon ->
@@ -360,6 +406,98 @@ fun TeamSlots(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun FilterContent(
+    selectedTypes: Set<String>,
+    sortMode: SortMode,
+    isSortAscending: Boolean,
+    onTypeFilterChanged: (String) -> Unit,
+    onSortModeChanged: (SortMode) -> Unit,
+    onToggleSortDirection: () -> Unit,
+    onClearFilters: () -> Unit
+) {
+    val types = listOf(
+        "normal", "fighting", "flying", "poison", "ground", "rock",
+        "bug", "ghost", "steel", "fire", "water", "grass",
+        "electric", "psychic", "ice", "dragon", "dark", "fairy"
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            "Sort by",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onToggleSortDirection) {
+                Icon(
+                    imageVector = if (isSortAscending) Icons.Default.ArrowUpward
+                    else Icons.Default.ArrowDownward,
+                    contentDescription = "Toggle direction"
+                )
+            }
+
+            FilterChip(
+                selected = sortMode == SortMode.BY_NUMBER,
+                onClick = { onSortModeChanged(SortMode.BY_NUMBER) },
+                label = { Text("Number") }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            FilterChip(
+                selected = sortMode == SortMode.BY_NAME,
+                onClick = { onSortModeChanged(SortMode.BY_NAME) },
+                label = { Text("Name") }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            "Filter by type",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Column {
+            types.chunked(6).forEach { row ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    row.forEach { type ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            IconButton(onClick = { onTypeFilterChanged(type) }) {
+                                Image(
+                                    painter = painterResource(getTypeSmallIcon(type)),
+                                    contentDescription = type,
+                                    modifier = Modifier.size(
+                                        if (type in selectedTypes) 36.dp else 28.dp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextButton(onClick = onClearFilters) {
+            Text("Clear all filters", color = MaterialTheme.colorScheme.error)
         }
     }
 }

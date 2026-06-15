@@ -132,11 +132,46 @@ class PokelistViewModel @Inject constructor(
     fun onSearchQueryChanged(query: String) {
         _state.update { it.copy(searchQuery = query) }
     }
+
+    fun onSortModeChanged(mode: SortMode) {
+        _state.update { it.copy(sortMode = mode) }
+    }
+
+    fun onToggleSortDirection() {
+        _state.update { it.copy(isSortAscending = !it.isSortAscending) }
+    }
+
+    fun onTypeFilterChanged(type: String) {
+        _state.update { currentState ->
+            val newTypes = currentState.selectedTypes.toMutableSet()
+            if (type in newTypes) {
+                newTypes.remove(type)
+            } else {
+                newTypes.add(type)
+            }
+            currentState.copy(selectedTypes = newTypes)
+        }
+    }
+
+    fun clearFilters() {
+        _state.update {
+            it.copy(
+                selectedTypes = emptySet(),
+                sortMode = SortMode.BY_NUMBER,
+                isSortAscending = true
+            )
+        }
+    }
 }
 
 sealed interface PokelistCommand {
     data class AddToTeam(val pokemon: Pokemon) : PokelistCommand
     data class RemoveFromTeam(val pokemonId: Int) : PokelistCommand
+}
+
+enum class SortMode {
+    BY_NUMBER,
+    BY_NAME
 }
 
 data class PokelistState(
@@ -145,5 +180,8 @@ data class PokelistState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val errorTimestamp: Long = 0L,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val selectedTypes: Set<String> = emptySet(),
+    val sortMode: SortMode = SortMode.BY_NUMBER,
+    val isSortAscending: Boolean = true
 )
