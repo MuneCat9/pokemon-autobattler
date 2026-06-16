@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -50,7 +51,11 @@ fun MainScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+        .fillMaxSize()
+        .navigationBarsPadding()
+    ) {
         AsyncImage(
             model = R.drawable.background_1,
             contentDescription = null,
@@ -135,7 +140,8 @@ fun MainScreen(
             onClick = onNavigateToPokelist,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(24.dp),
+                .padding(24.dp)
+                .navigationBarsPadding(),
             containerColor = MaterialTheme.colorScheme.onTertiaryFixed
         ) {
             Icon(
@@ -185,7 +191,7 @@ fun TeamSlots(
                             text = "?",
                             fontFamily = PokemonSolid,
                             fontSize = 36.sp,
-                            color = MaterialTheme.colorScheme.onTertiaryFixed
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -129,6 +130,7 @@ fun PokeListScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .navigationBarsPadding()
     ) {
         AsyncImage(
             model = R.drawable.background_3,
@@ -472,7 +474,7 @@ fun TeamSlots(
                             text = "?",
                             fontFamily = PokemonSolid,
                             fontSize = 32.sp,
-                            color = MaterialTheme.colorScheme.tertiary
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
