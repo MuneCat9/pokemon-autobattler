@@ -1,57 +1,56 @@
 package com.munecat.pokemon.presentation.ui.theme
 
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.DigitalRed
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonAccent
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonAccentAlpha30
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonBackground
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonPrimary
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonPrimaryAlpha70
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonPrimaryDark
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonPrimaryDarkAlpha30
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonSecondary
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonSecondaryDark
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonSecondaryLight
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonSurface
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.PokemonSurfaceVariant
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.TextOnAccent
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.TextOnPrimary
+import com.munecat.pokemon.presentation.ui.theme.PokemonColors.TextOnSecondary
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = PokemonPrimary.copy(alpha = 0.7f),
+    onPrimary = TextOnPrimary,
+    onPrimaryFixed = PokemonPrimaryAlpha70,
+    onPrimaryFixedVariant = PokemonPrimaryDarkAlpha30,
+    primaryContainer = PokemonPrimaryDark.copy(alpha = 0.3f),
+    secondary = PokemonSecondary.copy(alpha = 0.5f),
+    onSecondary = TextOnSecondary,
+    onSecondaryFixed = PokemonSecondaryLight,
+    secondaryContainer = PokemonSecondaryDark.copy(alpha = 0.3f),
+    tertiary = PokemonAccent.copy(alpha = 0.7f),
+    onTertiary = TextOnAccent,
+    onTertiaryFixed = PokemonAccentAlpha30,
+    background = PokemonBackground,
+    surface = PokemonSurface,
+    surfaceVariant = PokemonSurfaceVariant,
+    error = DigitalRed,
+    errorContainer = DigitalRed.copy(alpha = 0.15f),
+    onBackground = Color(0xFF212121),
+    onSurface = Color(0xFF212121)
 )
 
 @Composable
 fun PokemonTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
+        colorScheme = LightColorScheme,
+        typography = PokemonTypography,
         content = content
     )
 }

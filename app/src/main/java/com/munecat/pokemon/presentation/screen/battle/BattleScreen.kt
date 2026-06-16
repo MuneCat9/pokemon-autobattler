@@ -1,5 +1,9 @@
 package com.munecat.pokemon.presentation.screen.battle
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,7 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -54,9 +59,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
+import com.munecat.pokemon.R
 import com.munecat.pokemon.domain.model.battle.BattleLogEntry
 import com.munecat.pokemon.domain.model.battle.BattlePokemon
 import com.munecat.pokemon.domain.model.battle.LogType
+import com.munecat.pokemon.presentation.ui.theme.Ketchum
 import kotlinx.coroutines.delay
 
 
@@ -81,14 +88,25 @@ fun BattleScreen(
             onReady = { viewModel.confirmSelection() }
         )
     } else {
-
+        AsyncImage(
+            model = R.drawable.background_2,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         Scaffold(
+            containerColor = Color.Transparent,
             topBar = {
                 TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent
+                    ),
                     title = {
                         Text(
-                            modifier = Modifier.padding(start = 94.dp),
-                            text = "Battle"
+                            modifier = Modifier.padding(start = 68.dp),
+                            text = "Battle",
+                            fontFamily = Ketchum,
+                            fontSize = 36.sp
                         )
                     },
                     navigationIcon = {
@@ -145,11 +163,16 @@ fun BattleScreen(
                         Text(if (battleState.playerWon == true) "You won the battle!" else "You lost the battle!")
                     },
                     confirmButton = {
-                        TextButton(onClick = {
-                            viewModel.confirmResult()
-                            onBackClick()
-                        }) {
-                            Text("Accept")
+                        TextButton(
+                            onClick = {
+                                viewModel.confirmResult()
+                                onBackClick()
+                            }) {
+                            Text(
+                                text = "Accept",
+                                color = MaterialTheme.colorScheme.tertiary,
+                                letterSpacing = 4.sp
+                            )
                         }
                     }
                 )
@@ -172,16 +195,9 @@ fun OpponentCard(
     }
 
     Card(
-        modifier = modifier
-            .then(
-                if (flash) Modifier.drawBehind {
-                    drawRect(Color.Red.copy(alpha = 0.3f))
-                } else Modifier
-            ),
+        modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer.copy(
-                alpha = 0.3f
-            )
+            containerColor = MaterialTheme.colorScheme.onPrimaryFixedVariant
         )
     ) {
         Column(
@@ -191,7 +207,8 @@ fun OpponentCard(
             HpBar(
                 currentHp = pokemon.currentHp,
                 maxHp = pokemon.maxHp,
-                name = pokemon.pokemon.name
+                name = pokemon.pokemon.name,
+                flash = flash
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -255,16 +272,9 @@ fun PlayerCard(
     }
 
     Card(
-        modifier = modifier
-            .then(
-                if (flash) Modifier.drawBehind {
-                    drawRect(Color.Red.copy(alpha = 0.3f))
-                } else Modifier
-            ),
+        modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
-                alpha = 0.3f
-            )
+            containerColor = MaterialTheme.colorScheme.onTertiaryFixed
         )
     ) {
         Column(
@@ -274,7 +284,8 @@ fun PlayerCard(
             HpBar(
                 currentHp = pokemon.currentHp,
                 maxHp = pokemon.maxHp,
-                name = pokemon.pokemon.name
+                name = pokemon.pokemon.name,
+                flash = flash
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -330,13 +341,39 @@ fun PlayerCard(
 fun HpBar(
     currentHp: Int,
     maxHp: Int,
-    name: String
+    name: String,
+    flash: Boolean = false
 ) {
     val hpFraction = if (maxHp > 0) currentHp.toFloat() / maxHp else 0f
     val barColor = when {
-        hpFraction > 0.5f -> Color(0xFF4CAF50)
-        hpFraction > 0.25f -> Color(0xFFFFC107)
+        hpFraction > 0.66f -> Color(0xFF4CAF50)
+        hpFraction > 0.33f -> Color(0xFFFFC107)
         else -> Color(0xFFF44336)
+    }
+
+    var previousFraction by remember { mutableStateOf(hpFraction) }
+    var currentFraction by remember { mutableStateOf(hpFraction) }
+
+    val animatedCurrent by animateFloatAsState(
+        targetValue = currentFraction,
+        animationSpec = tween(300, easing = FastOutSlowInEasing)
+    )
+
+    val animatedPrevious by animateFloatAsState(
+        targetValue = previousFraction,
+        animationSpec = tween(600, easing = LinearEasing)
+    )
+
+
+    LaunchedEffect(currentHp) {
+        if (hpFraction < previousFraction) {
+            currentFraction = hpFraction
+            delay(400)
+            previousFraction = hpFraction
+        } else {
+            currentFraction = hpFraction
+            previousFraction = hpFraction
+        }
     }
 
     Column {
@@ -356,16 +393,32 @@ fun HpBar(
                 .height(24.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .background(Color.Gray.copy(alpha = 0.3f))
+                .then(
+                    if (flash) Modifier.drawWithContent {
+                        drawContent()
+                        drawRect(Color.Red.copy(alpha = 0.5f))
+                    }.clip(RoundedCornerShape(10.dp))
+                    else Modifier
+                )
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(hpFraction)
+                    .fillMaxWidth(animatedPrevious)
                     .height(24.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(barColor),
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(animatedCurrent)
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(barColor)
             )
             Text(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 5.dp),
                 text = "HP: $currentHp/$maxHp",
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp,

@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -35,8 +39,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
+import com.munecat.pokemon.R
 import com.munecat.pokemon.domain.model.Pokemon
 import com.munecat.pokemon.presentation.screen.components.PokemonInfoDialog
+import com.munecat.pokemon.presentation.ui.theme.Ketchum
 import kotlin.math.roundToInt
 
 
@@ -54,6 +60,12 @@ fun TeamOrderSelection(
     var draggingIndex by remember { mutableStateOf(-1) }
     var targetIndex by remember { mutableStateOf(-1) }
 
+    AsyncImage(
+        model = R.drawable.background_2,
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -63,6 +75,7 @@ fun TeamOrderSelection(
     ) {
         Text(
             text = "Choose your team order",
+            fontFamily = Ketchum,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
@@ -71,9 +84,12 @@ fun TeamOrderSelection(
 
         Text(
             text = "Opponent team:",
+            fontFamily = Ketchum,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium
         )
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -96,9 +112,12 @@ fun TeamOrderSelection(
 
         Text(
             text = "Your team:",
+            fontFamily = Ketchum,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium
         )
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -141,9 +160,20 @@ fun TeamOrderSelection(
             onClick = onReady,
             modifier = Modifier
                 .width(200.dp)
-                .height(56.dp)
+                .height(56.dp),
+            shape = RoundedCornerShape(20),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.onPrimaryFixed,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
         ) {
-            Text("Ready!", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(
+                modifier = Modifier.padding(top = 4.dp),
+                text = "Ready!",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 4.sp,
+            )
         }
     }
     selectedPokemon?.let { pokemon ->
@@ -212,12 +242,13 @@ fun PlayerSlot(
             modifier = Modifier
                 .size(100.dp)
                 .padding(4.dp)
+                .clip(RoundedCornerShape(8.dp))
                 .clickable { onClick() },
             colors = CardDefaults.cardColors(
                 containerColor = when {
-                    isDragging -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                    isDragging -> MaterialTheme.colorScheme.tertiary
                     isTarget -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f)
-                    else -> MaterialTheme.colorScheme.primaryContainer
+                    else -> MaterialTheme.colorScheme.onTertiaryFixed
                 }
             )
         ) {
@@ -250,8 +281,9 @@ fun OpponentSlot(
             modifier = Modifier
                 .size(100.dp)
                 .padding(4.dp)
+                .clip(RoundedCornerShape(8.dp))
                 .clickable { onClick() },
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimaryFixedVariant)
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -264,6 +296,7 @@ fun OpponentSlot(
                 )
             }
         }
-        Text(pokemon.name, fontSize = 10.sp)
+
+        Text(pokemon.name, fontSize = 12.sp, fontWeight = FontWeight.Medium)
     }
 }

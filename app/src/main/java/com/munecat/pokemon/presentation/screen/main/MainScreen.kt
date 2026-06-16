@@ -1,5 +1,6 @@
 package com.munecat.pokemon.presentation.screen.main
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -36,6 +39,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.munecat.pokemon.R
 import com.munecat.pokemon.domain.model.Pokemon
+import com.munecat.pokemon.presentation.ui.theme.Ketchum
+import com.munecat.pokemon.presentation.ui.theme.PokemonSolid
 
 @Composable
 fun MainScreen(
@@ -46,17 +51,36 @@ fun MainScreen(
     val state by viewModel.state.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
+        AsyncImage(
+            model = R.drawable.background_1,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Image(
+                painter = painterResource(R.drawable.pokemon_logo2),
+                contentDescription = "Pokémon",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 32.dp, bottom = 16.dp)
+                    .height(120.dp)
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+            )
+
             Spacer(modifier = Modifier.height(48.dp))
 
             Text(
                 text = "Your Team",
+                fontFamily = Ketchum,
                 fontSize = 28.sp,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
@@ -72,7 +96,9 @@ fun MainScreen(
 
             Text(
                 text = "Battle Simulation",
+                fontFamily = Ketchum,
                 fontSize = 22.sp,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center
             )
@@ -82,15 +108,25 @@ fun MainScreen(
             Button(
                 onClick = { onNavigateToBattle() },
                 enabled = state.isStartEnabled,
-                shape = RoundedCornerShape(50),
+                shape = RoundedCornerShape(20),
                 modifier = Modifier
                     .width(200.dp)
-                    .height(56.dp)
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimaryFixed,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
             ) {
                 Text(
+                    modifier = Modifier.padding(top = 4.dp),
                     text = "Start",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 4.sp,
+                    color = if (state.isStartEnabled)
+                        MaterialTheme.colorScheme.background
+                    else
+                        MaterialTheme.colorScheme.background,
                 )
             }
         }
@@ -100,7 +136,7 @@ fun MainScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp),
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.onTertiaryFixed
         ) {
             Icon(
                 modifier = Modifier.size(40.dp),
@@ -127,7 +163,7 @@ fun TeamSlots(
                     .weight(1f)
                     .aspectRatio(1f),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = MaterialTheme.colorScheme.onTertiaryFixed
                 )
             ) {
                 Box(
@@ -144,9 +180,12 @@ fun TeamSlots(
                         )
                     } else {
                         Text(
+                            modifier = Modifier
+                                .padding(top = 8.dp),
                             text = "?",
-                            fontSize = 24.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                            fontFamily = PokemonSolid,
+                            fontSize = 36.sp,
+                            color = MaterialTheme.colorScheme.onTertiaryFixed
                         )
                     }
                 }

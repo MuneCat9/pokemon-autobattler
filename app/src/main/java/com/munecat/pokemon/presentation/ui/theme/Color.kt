@@ -2,10 +2,31 @@ package com.munecat.pokemon.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+object PokemonColors {
+    val DigitalRed = Color(0xFFFF0000)
+    val RussianRed = Color(0xFFCC0000)
+    val LightUltramarineBlue = Color(0xFF3B4CCA)
+    val GoldenYellow = Color(0xFFFFDE00)
+    val Xanthophyll = Color(0xFFB3A125)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+    val PokemonPrimary = DigitalRed
+    val PokemonPrimaryDark = RussianRed
+    val PokemonSecondary = GoldenYellow
+    val PokemonSecondaryDark = Xanthophyll
+    val PokemonSecondaryLight = Color(0xFFFFFAE0)
+    val PokemonPrimaryAlpha70 = Color(0xFFFF4D4D)
+    val PokemonPrimaryDarkAlpha30 = Color(0xFFF5CCCC)
+    val PokemonAccentAlpha30 = Color(0xFFC2C5F5)
+    val PokemonAccent = LightUltramarineBlue
+
+    val TextOnPrimary = Color.White
+    val TextOnSecondary = Color(0xFF212121)
+    val TextOnAccent = Color.White
+
+    val PokemonBackground = Color(0xFFFAFAFA)
+    val PokemonSurface = Color.White
+    val PokemonSurfaceVariant = Color(0xFFF5F5F5)
+
+    val TextPrimary = Color(0xFF212121)
+    val TextSecondary = Color(0xFF757575)
+}
