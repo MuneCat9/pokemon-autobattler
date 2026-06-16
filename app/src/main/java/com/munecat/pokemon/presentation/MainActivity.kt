@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.munecat.pokemon.presentation.navigation.NavGraph
-import com.munecat.pokemon.presentation.screen.pokelist.PokeListScreen
 import com.munecat.pokemon.presentation.ui.theme.PokemonTheme
 import dagger.hilt.android.AndroidEntryPoint
 
