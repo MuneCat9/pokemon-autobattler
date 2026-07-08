@@ -16,20 +16,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.DragIndicator
+import androidx.compose.material.icons.filled.HorizontalRule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -41,8 +50,11 @@ import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import com.munecat.pokemon.R
 import com.munecat.pokemon.domain.model.Pokemon
+import com.munecat.pokemon.domain.model.battle.PokemonType
+import com.munecat.pokemon.domain.model.battle.TypeEffectiveness
 import com.munecat.pokemon.presentation.screen.components.PokemonInfoDialog
 import com.munecat.pokemon.presentation.ui.theme.Ketchum
+import java.util.Locale
 import kotlin.math.roundToInt
 
 
@@ -57,8 +69,8 @@ fun TeamOrderSelection(
 ) {
     var selectedPokemon by remember { mutableStateOf<Pokemon?>(null) }
 
-    var draggingIndex by remember { mutableStateOf(-1) }
-    var targetIndex by remember { mutableStateOf(-1) }
+    var draggingIndex by remember { mutableIntStateOf(-1) }
+    var targetIndex by remember { mutableIntStateOf(-1) }
 
     AsyncImage(
         model = R.drawable.background_2,
@@ -109,6 +121,25 @@ fun TeamOrderSelection(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            teamOrder.forEachIndexed { index, id ->
+                val playerPokemon = allPokemon[id]
+                val opponentPokemon = allPokemon[opponentOrder.getOrNull(index)]
+                
+                Box(modifier = Modifier.size(100.dp), contentAlignment = Alignment.Center) {
+                    if (playerPokemon != null && opponentPokemon != null) {
+                        EffectivenessArrow(playerPokemon, opponentPokemon)
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Text(
             text = "Your team:",
@@ -185,6 +216,46 @@ fun TeamOrderSelection(
 }
 
 @Composable
+fun EffectivenessArrow(player: Pokemon, opponent: Pokemon) {
+    val playerTypes = player.types.mapNotNull { PokemonType.fromString(it) }
+    val opponentTypes = opponent.types.mapNotNull { PokemonType.fromString(it) }
+
+    val playerToOpponentMax = playerTypes.maxOfOrNull { pType ->
+        TypeEffectiveness.getMultiplier(pType, opponentTypes)
+    } ?: 1f
+
+    val opponentToPlayerMax = opponentTypes.maxOfOrNull { oType ->
+        TypeEffectiveness.getMultiplier(oType, playerTypes)
+    } ?: 1f
+
+    val (icon, color, displayMultiplier) = when {
+        playerToOpponentMax > opponentToPlayerMax ->
+            Triple(Icons.Default.ArrowUpward, Color(0xFF4CAF50), playerToOpponentMax)
+        playerToOpponentMax < opponentToPlayerMax ->
+            Triple(Icons.Default.ArrowDownward, Color(0xFFF44336), opponentToPlayerMax)
+        else ->
+            Triple(Icons.Default.HorizontalRule, Color(0xFF9E9E9E), 1f)
+    }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(28.dp)
+        )
+        if (displayMultiplier != 1f) {
+            Text(
+                text = "×${String.format(Locale.ROOT, "%.1f", displayMultiplier)}",
+                fontSize = 11.sp,
+                color = color,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
 fun PlayerSlot(
     pokemon: Pokemon,
     index: Int,
@@ -196,9 +267,9 @@ fun PlayerSlot(
     onDragOver: (Int) -> Unit = {},
     onClick: () -> Unit = {}
 ) {
-    var offsetX by remember { mutableStateOf(0f) }
-    var offsetY by remember { mutableStateOf(0f) }
-    var slotWidth by remember { mutableStateOf(0) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var offsetY by remember { mutableFloatStateOf(0f) }
+    var slotWidth by remember { mutableIntStateOf(0) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -260,6 +331,15 @@ fun PlayerSlot(
                     model = pokemon.cardImageUrl,
                     contentDescription = pokemon.name,
                     modifier = Modifier.fillMaxSize(0.8f)
+                )
+                Icon(
+                    imageVector = Icons.Default.DragIndicator,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                        .size(18.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
             }
         }
