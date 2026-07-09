@@ -34,11 +34,11 @@ class PokemonRepositoryImpl @Inject constructor(
 
     override suspend fun refreshPokemonData() {
         val existingCount = pokemonDao.getAllPokemon().first().size
-        if (existingCount >= 151) {
+        if (existingCount >= 251) {
             return
         }
 
-        val listResponse = apiService.getPokemonList(limit = 151)
+        val listResponse = apiService.getPokemonList(limit = 251)
         val existingPokemon = pokemonDao.getAllPokemon().first().associateBy { it.id }
 
         listResponse.results.forEach { result ->

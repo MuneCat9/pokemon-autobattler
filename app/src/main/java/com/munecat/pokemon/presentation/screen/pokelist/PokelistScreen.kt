@@ -526,7 +526,7 @@ fun FilterContent(
                 onClick = { onSortModeChanged(SortMode.BY_NUMBER) },
                 label = {
                     Text(
-                        text = "1-151",
+                        text = "1-251",
                         fontFamily = FontFamily.Default,
                         color = MaterialTheme.colorScheme.onSecondary
                     )
