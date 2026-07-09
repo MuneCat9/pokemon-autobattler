@@ -27,11 +27,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -50,11 +54,12 @@ fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    var showRules by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
-        .fillMaxSize()
-        .navigationBarsPadding()
+            .fillMaxSize()
+            .navigationBarsPadding()
     ) {
         AsyncImage(
             model = R.drawable.background_1,
@@ -71,7 +76,7 @@ fun MainScreen(
         ) {
             Image(
                 painter = painterResource(R.drawable.pokemon_logo2),
-                contentDescription = "Pokémon",
+                contentDescription = stringResource(R.string.pok_mon),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 32.dp, bottom = 16.dp)
@@ -82,7 +87,7 @@ fun MainScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             Text(
-                text = "Your Team",
+                text = stringResource(R.string.your_team),
                 fontFamily = Ketchum,
                 fontSize = 28.sp,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -94,13 +99,14 @@ fun MainScreen(
 
             TeamSlots(
                 team = state.team,
+                onSlotClick = onNavigateToPokelist,
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(48.dp))
 
             Text(
-                text = "Battle Simulation",
+                text = stringResource(R.string.battle_simulation),
                 fontFamily = Ketchum,
                 fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -124,7 +130,7 @@ fun MainScreen(
             ) {
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = "Start",
+                    text = stringResource(R.string.start),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 4.sp,
@@ -137,7 +143,7 @@ fun MainScreen(
         }
 
         FloatingActionButton(
-            onClick = onNavigateToPokelist,
+            onClick = { showRules = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp)
@@ -147,16 +153,50 @@ fun MainScreen(
             Icon(
                 modifier = Modifier.size(40.dp),
                 painter = painterResource(R.drawable.pokeball_placeholder),
-                contentDescription = "Manage team",
+                contentDescription = stringResource(R.string.manage_team),
                 tint = Color.Unspecified
             )
         }
+    }
+
+    if (showRules) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showRules = false },
+            confirmButton = {
+                Button(onClick = { showRules = false }) {
+                    Text(
+                        modifier = Modifier.padding(top = 4.dp),
+                        text = stringResource(R.string.got_it),
+                        letterSpacing = 4.sp,
+
+                    )
+                }
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.battle_rules),
+                    fontFamily = Ketchum,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    letterSpacing = 2.sp
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.welcome_text),
+                    fontSize = 16.sp,
+                    lineHeight = 22.sp,
+                )
+            },
+            shape = RoundedCornerShape(20.dp)
+        )
     }
 }
 
 @Composable
 fun TeamSlots(
     team: List<Pokemon>,
+    onSlotClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -165,6 +205,7 @@ fun TeamSlots(
     ) {
         for (i in 0 until 3) {
             Card(
+                onClick = onSlotClick,
                 modifier = Modifier
                     .weight(1f)
                     .aspectRatio(1f),

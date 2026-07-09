@@ -54,7 +54,6 @@ import com.munecat.pokemon.domain.model.battle.PokemonType
 import com.munecat.pokemon.domain.model.battle.TypeEffectiveness
 import com.munecat.pokemon.presentation.screen.components.PokemonInfoDialog
 import com.munecat.pokemon.presentation.ui.theme.Ketchum
-import java.util.Locale
 import kotlin.math.roundToInt
 
 
@@ -228,13 +227,13 @@ fun EffectivenessArrow(player: Pokemon, opponent: Pokemon) {
         TypeEffectiveness.getMultiplier(oType, playerTypes)
     } ?: 1f
 
-    val (icon, color, displayMultiplier) = when {
+    val (icon, color) = when {
         playerToOpponentMax > opponentToPlayerMax ->
-            Triple(Icons.Default.ArrowUpward, Color(0xFF4CAF50), playerToOpponentMax)
+            Icons.Default.ArrowUpward to Color(0xFF4CAF50)
         playerToOpponentMax < opponentToPlayerMax ->
-            Triple(Icons.Default.ArrowDownward, Color(0xFFF44336), opponentToPlayerMax)
+            Icons.Default.ArrowDownward to Color(0xFFF44336)
         else ->
-            Triple(Icons.Default.HorizontalRule, Color(0xFF9E9E9E), 1f)
+            Icons.Default.HorizontalRule to Color(0xFF9E9E9E)
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -244,14 +243,6 @@ fun EffectivenessArrow(player: Pokemon, opponent: Pokemon) {
             tint = color,
             modifier = Modifier.size(28.dp)
         )
-        if (displayMultiplier != 1f) {
-            Text(
-                text = "×${String.format(Locale.ROOT, "%.1f", displayMultiplier)}",
-                fontSize = 11.sp,
-                color = color,
-                fontWeight = FontWeight.Bold
-            )
-        }
     }
 }
 

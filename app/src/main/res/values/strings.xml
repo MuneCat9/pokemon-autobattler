@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Pokemon</string>
+    <string name="got_it">Got it!</string>
+    <string name="welcome_text">Welcome to the Pokemon Battle Simulator! Choose your team of three Pokemon and face off against a randomly selected opponent. To increase your chances of winning, pay attention to Pokemon types and arrange your team order according to their vulnerabilities. Good luck!</string>
+    <string name="manage_team">Manage team</string>
+    <string name="pok_mon">Pokémon</string>
+    <string name="your_team">Your Team</string>
+    <string name="battle_simulation">Battle Simulation</string>
+    <string name="battle_rules">Battle Rules</string>
+    <string name="start">Start</string>
 </resources>
