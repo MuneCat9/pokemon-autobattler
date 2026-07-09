@@ -25,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -67,142 +69,160 @@ fun TeamOrderSelection(
     modifier: Modifier = Modifier
 ) {
     var selectedPokemon by remember { mutableStateOf<Pokemon?>(null) }
+    var showRules by remember { mutableStateOf(false) }
 
     var draggingIndex by remember { mutableIntStateOf(-1) }
     var targetIndex by remember { mutableIntStateOf(-1) }
 
-    AsyncImage(
-        model = R.drawable.background_2,
-        contentDescription = null,
-        modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop
-    )
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Choose your team order",
-            fontFamily = Ketchum,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
+    Box(modifier = Modifier.fillMaxSize()) {
+        AsyncImage(
+            model = R.drawable.background_2,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "Opponent team:",
-            fontFamily = Ketchum,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            opponentOrder.forEach { id ->
-                val pokemon = allPokemon[id]
-                if (pokemon != null) {
-                    OpponentSlot(
-                        pokemon = pokemon,
-                        onClick = {
-                            selectedPokemon = pokemon
-                        }
-                    )
-                }
-            }
-        }
+            Text(
+                text = "Choose your team order",
+                fontFamily = Ketchum,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            teamOrder.forEachIndexed { index, id ->
-                val playerPokemon = allPokemon[id]
-                val opponentPokemon = allPokemon[opponentOrder.getOrNull(index)]
-                
-                Box(modifier = Modifier.size(100.dp), contentAlignment = Alignment.Center) {
-                    if (playerPokemon != null && opponentPokemon != null) {
-                        EffectivenessArrow(playerPokemon, opponentPokemon)
+            Text(
+                text = "Opponent team:",
+                fontFamily = Ketchum,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                opponentOrder.forEach { id ->
+                    val pokemon = allPokemon[id]
+                    if (pokemon != null) {
+                        OpponentSlot(
+                            pokemon = pokemon,
+                            onClick = {
+                                selectedPokemon = pokemon
+                            }
+                        )
                     }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = "Your team:",
-            fontFamily = Ketchum,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            teamOrder.forEachIndexed { index, id ->
-                val pokemon = allPokemon[id]
-                if (pokemon != null) {
-                    PlayerSlot(
-                        pokemon = pokemon,
-                        index = index,
-                        isDragging = draggingIndex == index,
-                        isTarget = targetIndex == index && draggingIndex != index,
-                        onDragStart = { draggingIndex = index },
-                        onDragEnd = {
-                            if (targetIndex != -1 && targetIndex != draggingIndex && draggingIndex != -1) {
-                                onSwapSlots(draggingIndex, targetIndex)
-                            }
-                            draggingIndex = -1
-                            targetIndex = -1
-                        },
-                        onDragCancel = {
-                            draggingIndex = -1
-                            targetIndex = -1
-                        },
-                        onDragOver = { targetIdx ->
-                            if (targetIdx != index) {
-                                targetIndex = targetIdx
-                            }
-                        },
-                        onClick = { selectedPokemon = pokemon }
-                    )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                teamOrder.forEachIndexed { index, id ->
+                    val playerPokemon = allPokemon[id]
+                    val opponentPokemon = allPokemon[opponentOrder.getOrNull(index)]
+                    
+                    Box(modifier = Modifier.size(60.dp), contentAlignment = Alignment.Center) {
+                        if (playerPokemon != null && opponentPokemon != null) {
+                            EffectivenessArrow(playerPokemon, opponentPokemon)
+                        }
+                    }
                 }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Your team:",
+                fontFamily = Ketchum,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                teamOrder.forEachIndexed { index, id ->
+                    val pokemon = allPokemon[id]
+                    if (pokemon != null) {
+                        PlayerSlot(
+                            pokemon = pokemon,
+                            index = index,
+                            isDragging = draggingIndex == index,
+                            isTarget = targetIndex == index && draggingIndex != index,
+                            onDragStart = { draggingIndex = index },
+                            onDragEnd = {
+                                if (targetIndex != -1 && targetIndex != draggingIndex && draggingIndex != -1) {
+                                    onSwapSlots(draggingIndex, targetIndex)
+                                }
+                                draggingIndex = -1
+                                targetIndex = -1
+                            },
+                            onDragCancel = {
+                                draggingIndex = -1
+                                targetIndex = -1
+                            },
+                            onDragOver = { targetIdx ->
+                                if (targetIdx != index) {
+                                    targetIndex = targetIdx
+                                }
+                            },
+                            onClick = { selectedPokemon = pokemon }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = onReady,
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(56.dp),
+                shape = RoundedCornerShape(20),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimaryFixed,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            ) {
+                Text(
+                    modifier = Modifier.padding(top = 4.dp),
+                    text = "Ready!",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 4.sp,
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = onReady,
+        FloatingActionButton(
+            onClick = { showRules = true },
             modifier = Modifier
-                .width(200.dp)
-                .height(56.dp),
-            shape = RoundedCornerShape(20),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.onPrimaryFixed,
-                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
+                .align(Alignment.BottomEnd)
+                .padding(24.dp),
+            containerColor = MaterialTheme.colorScheme.onTertiaryFixed
         ) {
-            Text(
-                modifier = Modifier.padding(top = 4.dp),
-                text = "Ready!",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 4.sp,
+            Icon(
+                modifier = Modifier.size(40.dp),
+                painter = painterResource(R.drawable.pokeball_placeholder),
+                contentDescription = "Show rules",
+                tint = Color.Unspecified
             )
         }
     }
@@ -210,6 +230,22 @@ fun TeamOrderSelection(
         PokemonInfoDialog(
             pokemon = pokemon,
             onDismiss = { selectedPokemon = null }
+        )
+    }
+
+    if (showRules) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showRules = false },
+            confirmButton = {
+
+            },
+            title = {
+               
+            },
+            text = {
+
+            },
+            shape = RoundedCornerShape(20.dp)
         )
     }
 }
