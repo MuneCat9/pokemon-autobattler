@@ -59,7 +59,7 @@ class ExecuteTurnUseCase @Inject constructor() {
 
         val effectivenessText = when {
             typeMultiplier > 1f -> "It's super effective! "
-            typeMultiplier < 1f && typeMultiplier >= 0.75f -> "It's not very effective... "
+            typeMultiplier in 0.75f..<1f -> "It's not very effective... "
             typeMultiplier < 0.75f -> "It's barely effective... "
             else -> ""
         }

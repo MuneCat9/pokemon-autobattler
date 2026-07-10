@@ -468,7 +468,6 @@ fun TypeEffectivenessTable() {
             .heightIn(max = 450.dp)
             .padding(horizontal = 0.dp)
     ) {
-        // Заголовок
         Row(
             modifier = Modifier
                 .fillMaxWidth()
