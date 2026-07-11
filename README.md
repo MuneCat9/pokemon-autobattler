@@ -58,7 +58,7 @@ Quality is a core focus of this project. It includes a comprehensive test suite 
 
 | Smooth Drag & Drop & Live Hints |
 | :---: |
-| <video src="https://github.com/user-attachments/assets/8f1f2c8d-6a0e-484a-b1a8-6a3bc3aa9fcb" width="300" muted autoplay loop></video> |
+| <video src="https://github.com/user-attachments/assets/8f1f2c8d-6a0e-484a-b1a8-6a3bc3aa9fcb" width="300" autoplay loop muted playsinline></video> |
 
 ---
 
