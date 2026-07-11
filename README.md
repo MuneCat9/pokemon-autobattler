@@ -52,7 +52,7 @@ Quality is a core focus of this project. It includes a comprehensive test suite 
 
 | Main Screen | PokeList | Team Selection | Battle |
 | :---: | :---: | :---: | :---: |
-| [Placeholder] | [Placeholder] | [Placeholder] | [Placeholder] |
+| <img width="576" height="1280" alt="1" src="https://github.com/user-attachments/assets/7f1361cb-7a2d-4914-bd20-403beec26a36" /> | <img width="576" height="1280" alt="2" src="https://github.com/user-attachments/assets/d78d5a45-c96a-4a38-8a04-4d95406ca5f1" /> | <img width="576" height="1280" alt="3" src="https://github.com/user-attachments/assets/12d32081-3300-4514-8132-842e6148d667" /> | <img width="576" height="1280" alt="4" src="https://github.com/user-attachments/assets/591ec207-1dde-496a-9ab3-e682ff612337" /> |
 
 *(Note: Add your actual screenshots or GIFs of the drag-and-drop animation here!)*
 
