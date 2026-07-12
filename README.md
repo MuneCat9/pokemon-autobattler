@@ -66,13 +66,12 @@ The project includes unit tests covering the battle engine, ViewModels and busin
 
 ## ⚙️ Installation
 
+1. Clone the repository:
 ```bash
 git clone https://github.com/MuneCat9/pokemon-autobattler.git
 ```
-
-1. Open the project in Android Studio Ladybug or newer.
-2. Sync Gradle.
-3. Run the `app` module.
+2. Open the project in Android Studio Ladybug or newer.
+3. Sync Gradle and run the app module.
 
 ---
    
