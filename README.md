@@ -1,11 +1,13 @@
 # 🛡️ PokeBattle Simulator
 
-A modern, high-performance Android application that simulates Pokémon battles using the official PokeAPI. Built with **Jetpack Compose** and **Clean Architecture**, this project demonstrates advanced UI/UX patterns, complex state management, and robust testing.
+A modern Android application that uses the official PokeAPI to build and simulate Pokémon battles. Built with Jetpack Compose and Clean Architecture, it includes complex state management and comprehensive unit testing.
+
+The goal of this project was to practice modern Android development by building a complete application with a scalable architecture and realistic business logic.
 
 ## 🚀 Key Features
 
 *   **Dynamic Team Management**: Browse a list of 251 Pokémon (Gen 1 & 2) and build your ultimate team of three.
-*   **Advanced Reordering UX**: Features a smooth **"Live Swap" Drag-and-Drop** system for arranging team order before battle.
+*   **Reordering UX**: Features a smooth **"Live Swap" Drag-and-Drop** system for arranging team order before battle.
 *   **Strategic Battle Hints**: Real-time **Type Effectiveness indicators** (Advantage/Disadvantage arrows) that update instantly as you reorder your team.
 *   **Battle Engine**: A custom simulation logic including:
     *   Damage calculation based on Attack/Defense stats.
@@ -16,7 +18,7 @@ A modern, high-performance Android application that simulates Pokémon battles u
 
 ## 🏗️ Architecture
 
-The project follows **Clean Architecture** principles to ensure scalability and maintainability:
+The application follows Clean Architecture with a clear separation of Presentation, Domain and Data layers:
 
 *   **Domain Layer**: Pure business logic, including Use Cases, Repository interfaces, and the core Battle Engine.
 *   **Data Layer**: Data sources (Retrofit for PokeAPI, Room for local storage) and Repository implementations.
@@ -36,7 +38,7 @@ The project follows **Clean Architecture** principles to ensure scalability and 
 
 ## 🧪 Testing
 
-Quality is a core focus of this project. It includes a comprehensive test suite covering different layers:
+The project includes unit tests covering the battle engine, ViewModels and business logic:
 
 *   **Domain**: `TypeEffectivenessTest` verifies the accuracy of the type-advantage matrix.
 *   **Use Cases**: `ExecuteTurnUseCaseTest` covers the complex battle logic, damage math, and fainted states.
@@ -44,8 +46,8 @@ Quality is a core focus of this project. It includes a comprehensive test suite 
 
 ## 🎨 UI/UX Highlights
 
-*   **Custom Theming**: Integrated brand-accurate fonts (Ketchum, Pokemon Solid).
-*   **Smooth Animations**: Used `animateIntOffsetAsState` and `zIndex` for a premium feel during team selection.
+*   **Custom Pokémon fonts**: Integrated brand-accurate fonts (Ketchum, Pokemon Solid).
+*   **Smooth Animations**: Drag-and-drop animations using animateIntOffsetAsState and zIndex.
 *   **Responsive Design**: Layouts optimized for different screen densities using `LocalDensity`.
 
 ## 📸 Screenshots
@@ -64,9 +66,13 @@ Quality is a core focus of this project. It includes a comprehensive test suite 
 
 ## ⚙️ Installation
 
-1. Clone the repository:
-2. Open the project in **Android Studio Ladybug** or newer.
-3. Sync Gradle and run the `app` module.
+```bash
+git clone https://github.com/MuneCat9/pokemon-autobattler.git
+```
+
+1. Open the project in Android Studio Ladybug or newer.
+2. Sync Gradle.
+3. Run the `app` module.
 
 ---
    
