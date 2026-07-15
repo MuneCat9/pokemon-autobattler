@@ -73,5 +73,11 @@ git clone https://github.com/MuneCat9/pokemon-autobattler.git
 2. Open the project in Android Studio Ladybug or newer.
 3. Sync Gradle and run the `app` module.
 
+or 
+
+## 📦 Download APK
+
+[Download latest APK](https://github.com/MuneCat9/pokemon-cards/releases/latest/download/app-debug.apk)
+
 ---
    
