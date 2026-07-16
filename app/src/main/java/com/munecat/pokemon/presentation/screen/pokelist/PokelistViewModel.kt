@@ -47,17 +47,14 @@ class PokelistViewModel @Inject constructor(
         viewModelScope.launch {
             manageTeamUseCase.getTeam().collect { team ->
                 _state.update { currentState ->
-                    // Строим команду по слотам из DataStore
                     val slots = teamPreferences.getSlots()
                     val sortedTeam = slots.mapNotNull { slotId ->
                         if (slotId == TeamPreferences.EMPTY_SLOT) null
                         else team.find { it.id == slotId }
                     }
-                    // Добавляем покемонов из БД, которых нет в слотах (первая загрузка)
                     val teamFromDb = team.filter { pokemon ->
                         pokemon.id !in slots
                     }
-                    // Если слоты пусты — заполняем их текущей командой
                     if (slots.all { it == TeamPreferences.EMPTY_SLOT } && team.isNotEmpty()) {
                         team.forEachIndexed { index, pokemon ->
                             teamPreferences.saveSlot(index, pokemon.id)
