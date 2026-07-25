@@ -44,9 +44,13 @@ object ApiServiceModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(converterFactory: Converter.Factory): Retrofit {
+    fun provideRetrofit(
+        converterFactory: Converter.Factory,
+        okHttpClient: OkHttpClient
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://pokeapi.co/api/v2/")
+            .client(okHttpClient)
             .addConverterFactory(converterFactory)
             .build()
     }
