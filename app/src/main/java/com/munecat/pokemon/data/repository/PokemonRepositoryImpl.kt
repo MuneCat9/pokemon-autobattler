@@ -41,18 +41,18 @@ class PokemonRepositoryImpl @Inject constructor(
         val listResponse = apiService.getPokemonList(limit = 251)
         val existingPokemon = pokemonDao.getAllPokemon().first().associateBy { it.id }
 
-        listResponse.results.forEach { result ->
+        val newEntities = listResponse.results.map { result ->
             val id = result.url.trimEnd('/').split('/').last().toInt()
             val detail = apiService.getPokemonDetail(id)
             val entityDto = detail.toDbModel()
 
             val existing = existingPokemon[id]
-            val updatedEntity = if (existing != null) {
+            if (existing != null) {
                 entityDto.copy(isInTeam = existing.isInTeam)
             } else {
                 entityDto
             }
-            pokemonDao.insertAll(listOf(updatedEntity))
         }
+        pokemonDao.insertAll(newEntities)
     }
 }
