@@ -1,5 +1,7 @@
 package com.munecat.pokemon.domain.model.battle
 
+import com.munecat.pokemon.domain.model.battle.PokemonType.*
+
 enum class PokemonType {
     NORMAL, FIGHTING, FLYING, POISON, GROUND, ROCK,
     BUG, GHOST, STEEL, FIRE, WATER, GRASS,
@@ -17,84 +19,27 @@ enum class PokemonType {
 }
 
 object TypeEffectiveness {
+    private fun eff(vararg pairs: Pair<PokemonType, Float>) = mapOf(*pairs)
+
     private val chart: Map<PokemonType, Map<PokemonType, Float>> = mapOf(
-        PokemonType.NORMAL to mapOf(
-            PokemonType.ROCK to 0.75f, PokemonType.STEEL to 0.75f, PokemonType.GHOST to 0.5f
-        ),
-        PokemonType.FIGHTING to mapOf(
-            PokemonType.NORMAL to 1.5f, PokemonType.ROCK to 1.5f, PokemonType.STEEL to 1.5f,
-            PokemonType.ICE to 1.5f, PokemonType.DARK to 1.5f,
-            PokemonType.FLYING to 0.75f, PokemonType.POISON to 0.75f, PokemonType.BUG to 0.75f,
-            PokemonType.PSYCHIC to 0.75f, PokemonType.FAIRY to 0.75f, PokemonType.GHOST to 0.5f
-        ),
-        PokemonType.FLYING to mapOf(
-            PokemonType.FIGHTING to 1.5f, PokemonType.BUG to 1.5f, PokemonType.GRASS to 1.5f,
-            PokemonType.ROCK to 0.75f, PokemonType.STEEL to 0.75f, PokemonType.ELECTRIC to 0.75f
-        ),
-        PokemonType.POISON to mapOf(
-            PokemonType.GRASS to 1.5f, PokemonType.FAIRY to 1.5f,
-            PokemonType.POISON to 0.75f, PokemonType.GROUND to 0.75f,
-            PokemonType.ROCK to 0.75f, PokemonType.GHOST to 0.75f, PokemonType.STEEL to 0.5f
-        ),
-        PokemonType.GROUND to mapOf(
-            PokemonType.POISON to 1.5f, PokemonType.ROCK to 1.5f, PokemonType.STEEL to 1.5f,
-            PokemonType.FIRE to 1.5f, PokemonType.ELECTRIC to 1.5f,
-            PokemonType.GRASS to 0.75f, PokemonType.BUG to 0.75f, PokemonType.FLYING to 0.5f
-        ),
-        PokemonType.ROCK to mapOf(
-            PokemonType.FLYING to 1.5f, PokemonType.BUG to 1.5f, PokemonType.FIRE to 1.5f, PokemonType.ICE to 1.5f,
-            PokemonType.FIGHTING to 0.75f, PokemonType.GROUND to 0.75f, PokemonType.STEEL to 0.75f
-        ),
-        PokemonType.BUG to mapOf(
-            PokemonType.GRASS to 1.5f, PokemonType.PSYCHIC to 1.5f, PokemonType.DARK to 1.5f,
-            PokemonType.FIGHTING to 0.75f, PokemonType.FLYING to 0.75f, PokemonType.POISON to 0.75f,
-            PokemonType.GHOST to 0.75f, PokemonType.STEEL to 0.75f, PokemonType.FIRE to 0.75f, PokemonType.FAIRY to 0.75f
-        ),
-        PokemonType.GHOST to mapOf(
-            PokemonType.PSYCHIC to 1.5f, PokemonType.GHOST to 1.5f,
-            PokemonType.DARK to 0.75f, PokemonType.NORMAL to 0.5f
-        ),
-        PokemonType.STEEL to mapOf(
-            PokemonType.ROCK to 1.5f, PokemonType.ICE to 1.5f, PokemonType.FAIRY to 1.5f,
-            PokemonType.STEEL to 0.75f, PokemonType.FIRE to 0.75f, PokemonType.WATER to 0.75f, PokemonType.ELECTRIC to 0.75f
-        ),
-        PokemonType.FIRE to mapOf(
-            PokemonType.GRASS to 1.5f, PokemonType.ICE to 1.5f, PokemonType.BUG to 1.5f, PokemonType.STEEL to 1.5f,
-            PokemonType.FIRE to 0.75f, PokemonType.WATER to 0.75f, PokemonType.ROCK to 0.75f, PokemonType.DRAGON to 0.75f
-        ),
-        PokemonType.WATER to mapOf(
-            PokemonType.FIRE to 1.5f, PokemonType.GROUND to 1.5f, PokemonType.ROCK to 1.5f,
-            PokemonType.WATER to 0.75f, PokemonType.GRASS to 0.75f, PokemonType.DRAGON to 0.75f
-        ),
-        PokemonType.GRASS to mapOf(
-            PokemonType.WATER to 1.5f, PokemonType.GROUND to 1.5f, PokemonType.ROCK to 1.5f,
-            PokemonType.FIRE to 0.75f, PokemonType.GRASS to 0.75f, PokemonType.POISON to 0.75f,
-            PokemonType.FLYING to 0.75f, PokemonType.BUG to 0.75f, PokemonType.DRAGON to 0.75f, PokemonType.STEEL to 0.75f
-        ),
-        PokemonType.ELECTRIC to mapOf(
-            PokemonType.WATER to 1.5f, PokemonType.FLYING to 1.5f,
-            PokemonType.GRASS to 0.75f, PokemonType.ELECTRIC to 0.75f, PokemonType.DRAGON to 0.75f, PokemonType.GROUND to 0.5f
-        ),
-        PokemonType.PSYCHIC to mapOf(
-            PokemonType.FIGHTING to 1.5f, PokemonType.POISON to 1.5f,
-            PokemonType.PSYCHIC to 0.75f, PokemonType.STEEL to 0.75f, PokemonType.DARK to 0.5f
-        ),
-        PokemonType.ICE to mapOf(
-            PokemonType.GRASS to 1.5f, PokemonType.GROUND to 1.5f, PokemonType.FLYING to 1.5f, PokemonType.DRAGON to 1.5f,
-            PokemonType.FIRE to 0.75f, PokemonType.WATER to 0.75f, PokemonType.ICE to 0.75f, PokemonType.STEEL to 0.75f
-        ),
-        PokemonType.DRAGON to mapOf(
-            PokemonType.DRAGON to 1.5f,
-            PokemonType.STEEL to 0.75f, PokemonType.FAIRY to 0.5f
-        ),
-        PokemonType.DARK to mapOf(
-            PokemonType.PSYCHIC to 1.5f, PokemonType.GHOST to 1.5f,
-            PokemonType.FIGHTING to 0.75f, PokemonType.DARK to 0.75f, PokemonType.FAIRY to 0.75f
-        ),
-        PokemonType.FAIRY to mapOf(
-            PokemonType.FIGHTING to 1.5f, PokemonType.DRAGON to 1.5f, PokemonType.DARK to 1.5f,
-            PokemonType.FIRE to 0.75f, PokemonType.POISON to 0.75f, PokemonType.STEEL to 0.75f
-        )
+        NORMAL   to eff(ROCK to 0.75f, STEEL to 0.75f, GHOST to 0.5f),
+        FIGHTING to eff(NORMAL to 1.5f, ROCK to 1.5f, STEEL to 1.5f, ICE to 1.5f, DARK to 1.5f, FLYING to 0.75f, POISON to 0.75f, BUG to 0.75f, PSYCHIC to 0.75f, FAIRY to 0.75f, GHOST to 0.5f),
+        FLYING   to eff(FIGHTING to 1.5f, BUG to 1.5f, GRASS to 1.5f, ROCK to 0.75f, STEEL to 0.75f, ELECTRIC to 0.75f),
+        POISON   to eff(GRASS to 1.5f, FAIRY to 1.5f, POISON to 0.75f, GROUND to 0.75f, ROCK to 0.75f, GHOST to 0.75f, STEEL to 0.5f),
+        GROUND   to eff(POISON to 1.5f, ROCK to 1.5f, STEEL to 1.5f, FIRE to 1.5f, ELECTRIC to 1.5f, GRASS to 0.75f, BUG to 0.75f, FLYING to 0.5f),
+        ROCK     to eff(FLYING to 1.5f, BUG to 1.5f, FIRE to 1.5f, ICE to 1.5f, FIGHTING to 0.75f, GROUND to 0.75f, STEEL to 0.75f),
+        BUG      to eff(GRASS to 1.5f, PSYCHIC to 1.5f, DARK to 1.5f, FIGHTING to 0.75f, FLYING to 0.75f, POISON to 0.75f, GHOST to 0.75f, STEEL to 0.75f, FIRE to 0.75f, FAIRY to 0.75f),
+        GHOST    to eff(PSYCHIC to 1.5f, GHOST to 1.5f, DARK to 0.75f, NORMAL to 0.5f),
+        STEEL    to eff(ROCK to 1.5f, ICE to 1.5f, FAIRY to 1.5f, STEEL to 0.75f, FIRE to 0.75f, WATER to 0.75f, ELECTRIC to 0.75f),
+        FIRE     to eff(GRASS to 1.5f, ICE to 1.5f, BUG to 1.5f, STEEL to 1.5f, FIRE to 0.75f, WATER to 0.75f, ROCK to 0.75f, DRAGON to 0.75f),
+        WATER    to eff(FIRE to 1.5f, GROUND to 1.5f, ROCK to 1.5f, WATER to 0.75f, GRASS to 0.75f, DRAGON to 0.75f),
+        GRASS    to eff(WATER to 1.5f, GROUND to 1.5f, ROCK to 1.5f, FIRE to 0.75f, GRASS to 0.75f, POISON to 0.75f, FLYING to 0.75f, BUG to 0.75f, DRAGON to 0.75f, STEEL to 0.75f),
+        ELECTRIC to eff(WATER to 1.5f, FLYING to 1.5f, GRASS to 0.75f, ELECTRIC to 0.75f, DRAGON to 0.75f, GROUND to 0.5f),
+        PSYCHIC  to eff(FIGHTING to 1.5f, POISON to 1.5f, PSYCHIC to 0.75f, STEEL to 0.75f, DARK to 0.5f),
+        ICE      to eff(GRASS to 1.5f, GROUND to 1.5f, FLYING to 1.5f, DRAGON to 1.5f, FIRE to 0.75f, WATER to 0.75f, ICE to 0.75f, STEEL to 0.75f),
+        DRAGON   to eff(DRAGON to 1.5f, STEEL to 0.75f, FAIRY to 0.5f),
+        DARK     to eff(PSYCHIC to 1.5f, GHOST to 1.5f, FIGHTING to 0.75f, DARK to 0.75f, FAIRY to 0.75f),
+        FAIRY    to eff(FIGHTING to 1.5f, DRAGON to 1.5f, DARK to 1.5f, FIRE to 0.75f, POISON to 0.75f, STEEL to 0.75f)
     )
 
     fun getMultiplier(attackingType: PokemonType, defendingType: PokemonType): Float {
