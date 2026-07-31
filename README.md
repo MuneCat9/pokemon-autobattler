@@ -1,4 +1,4 @@
-# PokeBattle Simulator
+# Pokemon Autobattler
 
 A modern Android application that uses the official PokeAPI to build and simulate Pokémon battles. Built with Jetpack Compose and Clean Architecture, it includes complex state management and comprehensive unit testing.
 
