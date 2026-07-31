@@ -35,6 +35,8 @@ class BattleViewModel @Inject constructor(
 
     fun loadAllPokemon() {
         viewModelScope.launch {
+            if (_state.value.allPokemon.isNotEmpty()) return@launch
+
             val allPokemon = repository.getAllPokemon().first()
             _state.update {
                 it.copy(allPokemon = allPokemon)
@@ -45,7 +47,9 @@ class BattleViewModel @Inject constructor(
     private fun loadTeamAndGenerateOpponent() {
         viewModelScope.launch {
             val playerTeam = repository.getTeam().first()
-            val allPokemon = repository.getAllPokemon().first()
+            val allPokemon = _state.value.allPokemon.ifEmpty {
+                repository.getAllPokemon().first()
+            }
 
             val slots = teamPreferences.getSlots()
             val orderedTeam = slots.mapNotNull { slotId ->
@@ -59,6 +63,7 @@ class BattleViewModel @Inject constructor(
 
             _state.update {
                 it.copy(
+                    allPokemon = allPokemon,
                     teamOrder = completeTeam.map { pokemon -> pokemon.id },
                     opponentOrder = opponentTeam.map { pokemon -> pokemon.id }
                 )
@@ -80,7 +85,7 @@ class BattleViewModel @Inject constructor(
 
     fun confirmSelection() {
         viewModelScope.launch {
-            val allPokemon = repository.getAllPokemon().first()
+            val allPokemon = _state.value.allPokemon
             val playerTeam = _state.value.teamOrder.mapNotNull { id ->
                 allPokemon.find { it.id == id }
             }
