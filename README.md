@@ -1,12 +1,12 @@
 # Pokemon Autobattler
 
-A modern Android application that uses the official PokeAPI to build and simulate Pokémon battles. Built with Jetpack Compose and Clean Architecture, it includes complex state management and comprehensive unit testing.
+A modern Android application that uses the official PokeAPI to build and simulate Pokemon battles. Built with Jetpack Compose and Clean Architecture, it includes complex state management and comprehensive unit testing.
 
 The goal of this project was to practice modern Android development by building a complete application with a scalable architecture and realistic business logic.
 
 ## Key Features
 
-*   **Dynamic Team Management**: Browse a list of 251 Pokémon (Gen 1 & 2) and build your ultimate team of three.
+*   **Dynamic Team Management**: Browse a list of 251 Pokemon (Gen 1 & 2) and build your ultimate team of three.
 *   **Reordering UX**: Features a smooth **"Live Swap" Drag-and-Drop** system for arranging team order before battle.
 *   **Strategic Battle Hints**: Real-time **Type Effectiveness indicators** (Advantage/Disadvantage arrows) that update instantly as you reorder your team.
 *   **Battle Engine**: A custom simulation logic including:
