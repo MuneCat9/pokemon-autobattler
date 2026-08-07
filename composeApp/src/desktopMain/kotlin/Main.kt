@@ -2,10 +2,12 @@ package com.munecat.pokemon
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.munecat.pokemon.di.initKoin
 
 fun main() {
-    // Пробуем OpenGL, если SOFTWARE не помог. 
-    // Если и это не поможет, попробуй удалить папку C:\Users\kotme_\.skiko
+
+    initKoin()
+
     System.setProperty("skiko.renderApi", "OPENGL")
     
     application {
