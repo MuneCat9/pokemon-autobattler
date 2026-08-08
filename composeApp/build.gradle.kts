@@ -23,20 +23,22 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
+                implementation(compose.materialIconsExtended)
                 
                 implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose)
                 implementation(libs.koin.compose.viewmodel)
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
-                
-                // Room KMP
+
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.androidx.sqlite.bundled)
-                
-                // Coil 3 (Multiplatform)
+
+                implementation(libs.androidx.datastore.preferences)
+
                 implementation(libs.coil.compose)
             }
         }
@@ -52,7 +54,8 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(libs.ktor.client.okhttp) // Оставим пока этот, но добавим альтернативу если что
+                implementation(libs.ktor.client.okhttp) 
+                implementation(libs.kotlinx.coroutines.swing)
             }
         }
     }
@@ -71,6 +74,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", libs.androidx.room.compiler)
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspDesktop", libs.androidx.room.compiler)
 }
 
 compose.desktop {

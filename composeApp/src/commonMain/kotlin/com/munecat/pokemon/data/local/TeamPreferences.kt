@@ -1,16 +1,14 @@
 package com.munecat.pokemon.data.local
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "team_prefs")
+expect fun createDataStore(): DataStore<Preferences>
 
-class TeamPreferences(private val context: Context) {
+class TeamPreferences(private val dataStore: DataStore<Preferences>) {
 
     companion object {
         val SLOT_0 = intPreferencesKey("slot_0")
@@ -20,7 +18,7 @@ class TeamPreferences(private val context: Context) {
     }
 
     suspend fun getSlots(): List<Int> {
-        val prefs = context.dataStore.data.first()
+        val prefs = dataStore.data.first()
         return listOf(
             prefs[SLOT_0] ?: EMPTY_SLOT,
             prefs[SLOT_1] ?: EMPTY_SLOT,
@@ -35,7 +33,7 @@ class TeamPreferences(private val context: Context) {
             2 -> SLOT_2
             else -> return
         }
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[key] = pokemonId
         }
     }
@@ -45,7 +43,7 @@ class TeamPreferences(private val context: Context) {
     }
 
     suspend fun clearAll() {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[SLOT_0] = EMPTY_SLOT
             prefs[SLOT_1] = EMPTY_SLOT
             prefs[SLOT_2] = EMPTY_SLOT
