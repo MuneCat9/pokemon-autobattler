@@ -32,6 +32,10 @@ kotlin {
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
                 
+                // Room KMP
+                implementation(libs.androidx.room.runtime)
+                implementation(libs.androidx.sqlite.bundled)
+                
                 // Coil 3 (Multiplatform)
                 implementation(libs.coil.compose)
             }

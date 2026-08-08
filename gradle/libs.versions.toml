@@ -28,7 +28,8 @@ lifecycleViewmodelCompose = "2.8.4"
 materialIconsExtendedVersion = "1.6.8"
 navigationCompose = "2.7.7"
 retrofit = "2.11.0"
-roomRuntime = "2.6.1"
+roomRuntime = "2.7.0-alpha11"
+sqliteBundled = "2.5.0-alpha11"
 workRuntimeKtx = "2.9.1"
 runtime = "1.6.8"
 
@@ -45,6 +46,7 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqliteBundled" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coilCompose" }
